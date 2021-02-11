@@ -8,6 +8,7 @@ import Timers from "./Other/Timers";
 import JSON5Helper from "./Other/JSON5Helper";
 import SessionStore from "./Other/SessionStore";
 import IORedis from "./Other/Redis";
+export * from "./Other/Types";
 const Redis = IORedis.r;
 
 interface List {
