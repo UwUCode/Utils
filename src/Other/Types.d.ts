@@ -34,3 +34,6 @@ export type KnownKeys<T> = {
 } extends { [_ in keyof T]: infer U } ? U : never;
 export type AnyObject<T = unknown> = Record<string, T>;
 export type AnyFunction<A extends Array<unknown> = Array<unknown>, B = unknown> = (...args: A) => B;
+export interface ModuleImport<T> {
+	default: T;
+}
