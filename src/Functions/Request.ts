@@ -1,8 +1,8 @@
+import Variables from "../Other/Variables";
+import * as fs from "fs-extra";
 import * as http from "http";
 import * as https from "https";
-import URL from "url";
-import * as fs from "fs-extra";
-import Variables from "../Other/Variables";
+import {URL} from "url";
 
 export default class Request {
 	private constructor() {
@@ -39,13 +39,13 @@ export default class Request {
 					"User-Agent": Variables.USER_AGENT
 				}
 			}, (res) => {
-				const data: Buffer[] = [];
+				const data: Array<Buffer> = [];
 				res
 					.on("data", (d) => data.push(d))
 					.on("error", (err) => b(err))
 					.on("end", () => a(Buffer.concat(data).toString()));
 			});
-			req.write(`api_option=paste&api_dev_key=${Variables.DEV_KEY}&api_user_key=${Variables.USER_KEY}&api_paste_code=${content}&api_paste_private=${privacy ?? 2}&api_paste_name=${name}&api_paste_expire_date=${expire || "1D"}`);
+			req.write(`api_option=paste&api_dev_key=${Variables.DEV_KEY!}&api_user_key=${Variables.USER_KEY!}&api_paste_code=${content}&api_paste_private=${privacy ?? 2}&api_paste_name=${name}&api_paste_expire_date=${expire || "1D"}`);
 			req.end();
 		});
 	}
@@ -75,11 +75,11 @@ export default class Request {
 	}> {
 		withHeaders = !!withHeaders;
 		return new Promise((a, b) => {
-			const uri = URL.parse(url);
+			const uri = new URL(url);
 			(uri.protocol === "https:" ? https : http).request({
 				method: "GET",
 				host: uri.host,
-				path: uri.path,
+				path: uri.pathname,
 				protocol: uri.protocol,
 				port: uri.port || uri.protocol === "https:" ? 443 : 80,
 				timeout: 3e4,
@@ -88,7 +88,7 @@ export default class Request {
 				},
 				rejectUnauthorized: false
 			}, (res) => {
-				const data: Buffer[] = [];
+				const data: Array<Buffer> = [];
 				res
 					.on("data", (d) => data.push(d))
 					.on("error", (err) => b(err))
@@ -104,7 +104,7 @@ export default class Request {
 	}
 
 	static get getImageFromURL() {
-		return this.fetchURL;
+		return this.fetchURL.bind(this);
 	}
 
 	/**
@@ -118,6 +118,6 @@ export default class Request {
 	 * @example Request.downloadImage("https://api.furry.bot/V2/furry/bulge/image", "/opt/FurryBot/bulge.png");
 	 */
 	static async downloadImage(url: string, filename: string): Promise<void> {
-		return this.fetchURL(url, false).then(img => fs.writeFileSync(filename, img));
+		return this.fetchURL(url, false).then((img) => fs.writeFileSync(filename, img));
 	}
 }

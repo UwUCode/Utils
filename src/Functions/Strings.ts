@@ -16,7 +16,7 @@ export default class Strings {
 		return str.toString().toLowerCase().replace(/^(.)|\s+(.)/g, (r) => r.toUpperCase());
 	}
 
-	static formatString(str: string, formatArgs: (string | number)[]) {
+	static formatString(str: string, formatArgs: Array<string | number>) {
 		formatArgs.map((a, i) => {
 			// console.log("1", new RegExp(`\\{${i}\\}`, "g"));
 			// console.log("2", str);
@@ -53,8 +53,9 @@ export default class Strings {
 
 	/**
 	 * Limit a string to a maximum length.
-	 * @param {string} str - the string to truncate 
-	 * @param {number} limit - the location to truncate at 
+	 *
+	 * @param {string} str - the string to truncate
+	 * @param {number} limit - the location to truncate at
 	 */
 	static truncate(str: string, limit: number) {
 		return str.length > limit ? `${str.slice(limit - 6)} (...)` : str;

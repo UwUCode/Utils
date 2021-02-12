@@ -1,8 +1,9 @@
-import { execSync } from "child_process";
+import { AnyFunction } from "../Other/Types";
 import ts from "typescript";
 import * as fs from "fs-extra";
-import * as os from "os";
 import JSON5 from "json5";
+import * as os from "os";
+import { execSync } from "child_process";
 
 export default class Internal {
 	private constructor() {
@@ -20,8 +21,8 @@ export default class Internal {
 	 * @example Internal.sanitize("Some (at)everyone text here");
 	 */
 	static sanitize(str: string) {
-		if (typeof str !== "string") str = (str as any).toString();
-		["*", "_", "@"].map(s => str = str.replace(new RegExp(`\\${s}`, "gi"), `\\${s}`));
+		if (typeof str !== "string") str = (str as string).toString();
+		["*", "_", "@"].map((s) => str = str.replace(new RegExp(`\\${s}`, "gi"), `\\${s}`));
 		return str;
 	}
 
@@ -35,7 +36,8 @@ export default class Internal {
 	 * @example Internal.consoleSanitize("someString");
 	 */
 	static consoleSanitize(str: string) {
-		if (typeof str !== "string") str = (str as any).toString();
+		if (typeof str !== "string") str = (str as string).toString();
+		// eslint-disable-next-line no-control-regex
 		return str.replace(/\u001B\[[0-9]{1,2}m/g, "");
 	}
 
@@ -71,10 +73,10 @@ export default class Internal {
 	 */
 	static getPaidTime(type: "db" | "main", amount: number, month?: number) {
 		month = month ?? new Date().getMonth() + 1;
-		const PRICE_DB = 25;
-		const PRICE_MAIN = 20;
-		const DAYS = this.getDaysInMonth(month);
-		const HOURLY = type === "db" ? PRICE_DB / DAYS : PRICE_MAIN / DAYS;
+		const PRICE_DB = 25,
+			PRICE_MAIN = 20,
+			DAYS = this.getDaysInMonth(month),
+			HOURLY = type === "db" ? PRICE_DB / DAYS : PRICE_MAIN / DAYS;
 
 		return ((Math.ceil((amount / HOURLY) * 10 / 5) * 5) / 10) * 24 * 60 * 60 * 1000;
 	}
@@ -104,28 +106,33 @@ export default class Internal {
 		// WINDOWS = wmic logicaldisk get size,freespace,caption
 
 		const drives: {
-			[k: string]: {
-				total: number;
-				free: number;
-			};
-		} = {};
-		const unix = process.platform !== "win32";
-		const out = execSync(unix ? "df -Pk \"/\"" : "wmic logicaldisk get size,freespace,caption")
-			.toString()
-			.split(os.EOL)
-			.slice(1)
-			.map(v => v.trim().split(/\s+(?=[\d/])/))
-			.filter(v => v.length > 0 && v[0] !== "");
+				[k: string]: {
+					total: number;
+					free: number;
+				};
+			} = {},
+			unix = process.platform !== "win32",
+			out = execSync(unix ? "df -Pk \"/\"" : "wmic logicaldisk get size,freespace,caption")
+				.toString()
+				.split(os.EOL)
+				.slice(1)
+				.map((v) => v.trim().split(/\s+(?=[\d/])/))
+				.filter((v) => v.length > 0 && v[0] !== "");
 
 		for (const line of out) {
-			if (unix) drives[line[5]] = {
-				free: Number(line[3]) * 1024,
-				total: Number(line[1]) * 1024
-			}; else drives[line[0]] = {
-				free: Number(line[1]),
-				total: Number(line[2])
-			};
+			if (unix) {
+				drives[line[5]] = {
+					free: Number(line[3]) * 1024,
+					total: Number(line[1]) * 1024
+				};
+			} else {
+				drives[line[0]] = {
+					free: Number(line[1]),
+					total: Number(line[2])
+				};
+			}
 		}
+
 
 		return {
 			drives,
@@ -144,7 +151,7 @@ export default class Internal {
 	 * @example Internal.getTSConfig("/opt/NPMBot/tsconfig.json");
 	 */
 	static getTSConfig(file: string) {
-		const c = JSON5.parse(fs.readFileSync(file).toString());
+		const c = (JSON5.parse as AnyFunction<[file: string], ts.TranspileOptions>)(fs.readFileSync(file).toString());
 		return {
 			...c,
 			compilerOptions: {

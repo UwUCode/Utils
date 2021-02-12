@@ -16,17 +16,18 @@ interface List {
 	"pastebin.userKey": string;
 	"pastebin.devKey": string;
 	redis: import("ioredis").Redis;
-};
+}
 
-function setValue<K extends keyof List>(key: K, val: List[K]): typeof setValue;
-function setValue<K extends keyof List>(key: K, val: any) {
+function setValue<K extends keyof List>(key: K, val: List[K]) {
 	// typescript doesn't narrow val properly so we just any it
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 	Variables[
 		key === "userAgent" ? "USER_AGENT" :
 			key === "pastebin.devKey" ? "DEV_KEY" :
 				key === "pastebin.userKey" ? "USER_KEY" :
 					key === "redis" ? "REDIS" : null as never
-	] = val;
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	] = val as any;
 
 
 	return setValue;

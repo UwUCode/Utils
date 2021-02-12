@@ -1,7 +1,6 @@
-import * as pkg from "../../package.json"
+import * as pkg from "../../package.json";
 
 export default class Variables {
-	private constructor() { }
 
 	static USER_AGENT = `@donovan_dmc\\utils/${pkg.version} (https://github.com/DonovanDMC)`;
 	static USER_KEY: string | null = null;

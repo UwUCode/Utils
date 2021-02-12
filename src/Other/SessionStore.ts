@@ -1,7 +1,7 @@
 class SessionStore<D> {
 	entries: Map<string, Partial<D>>;
 	constructor() {
-		this.entries = new Map();
+		this.entries = new Map<string, Partial<D>>();
 	}
 
 	get(id: string) {

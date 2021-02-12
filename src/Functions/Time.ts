@@ -1,3 +1,4 @@
+import { AnyObject } from "../Other/Types";
 import ms from "ms";
 
 export interface MsResponse {
@@ -22,14 +23,16 @@ export default class Time {
 	 * @static
 	 * @param {number} time - The time to convert.
 	 * @param {boolean} [words=false] - If we should return full words or just letters.
+	 * @param {boolean} [seconds=true] - If we should return seconds.
+	 * @param {boolean} [millis=false] - If we should return milliseconds.
 	 * @returns {(Promise<string | MsResponse>)}
 	 * @memberof Time
 	 * @example Time.ms(120000);
 	 * @example Time.ms(240000, true);
 	 */
-	static ms(time: number, words?: boolean, seconds?: boolean, ms?: boolean, obj?: false): string;
-	static ms(time: number, words: boolean, seconds: boolean, ms: boolean, obj: true): MsResponse;
-	static ms(time: number, words = false, seconds = true, ms = false, obj = false): any {
+	static ms(time: number, words?: boolean, seconds?: boolean, millis?: boolean, obj?: false): string;
+	static ms(time: number, words: boolean, seconds: boolean, millis: boolean, obj: true): MsResponse;
+	static ms(time: number, words = false, seconds = true, millis = false, obj = false) {
 		if (time < 0) throw new TypeError("Negative time provided.");
 		// @FIXME language :sweats:
 		if (time === 0) return words ? "0 seconds" : "0s";
@@ -57,7 +60,7 @@ export default class Time {
 
 		if (obj) return r;
 
-		const str: string[] = [];
+		const str: Array<string> = [];
 		if (r.ms > 0 && ms) str.push(`${r.ms} millisecond${r.ms === 1 ? "" : "s"}`);
 		if (r.s > 0) str.push(`${r.s} second${r.s === 1 ? "" : "s"}`);
 		if (r.m > 0) str.push(`${r.m} minute${r.m === 1 ? "" : "s"}`);
@@ -70,29 +73,31 @@ export default class Time {
 
 		if (!seconds) {
 			if (words) {
-				const e = str.find(v => v.indexOf("second") !== -1);
+				const e = str.find((v) => v.indexOf("second") !== -1);
 				if (e) {
 					str.splice(str.indexOf(e), 1);
 					if (str.length < 1) str.push("less than 1 minute");
 				}
 			} else {
-				delete (r as any).s;
+				delete (r as AnyObject<number>).s;
 			}
 		}
 
-		if (!ms) {
+
+		if (!millis) {
 			if (words) {
-				const e = str.find(v => v.indexOf("millisecond") !== -1);
+				const e = str.find((v) => v.indexOf("millisecond") !== -1);
 				if (e) {
 					str.splice(str.indexOf(e), 1);
 					if (str.length < 1) str.push("less than 1 second");
 				}
 			} else {
-				delete (r as any).ms;
+				delete (r as AnyObject<number>).ms;
 			}
 		}
 
-		return words ? str.reverse().join(", ") : Object.keys(r).filter(k => (r as any)[k] > 0).map(k => `${Math.floor((r as any)[k])}${k}`).reverse().reduce((a, b) => a + b, "");
+
+		return words ? str.reverse().join(", ") : Object.keys(r).filter((k) => (r as AnyObject<number>)[k] > 0).map((k) => `${Math.floor((r as AnyObject<number>)[k])}${k}`).reverse().reduce((a, b) => a + b, "");
 	}
 
 	/**
@@ -120,7 +125,7 @@ export default class Time {
 	 * @static
 	 * @param {(Date | number)} [d=new Date()] - The date to format.
 	 * @param {boolean} [hms=true] - If hh:mm:ss should be returned.
-	 * @param {boolean} [ms=false] - If ms should be returned.
+	 * @param {boolean} [millis=false] - If milliseconds should be returned.
 	 * @returns {string}
 	 * @memberof Time
 	 * @example Time.formatDateWithPadding();
@@ -128,20 +133,21 @@ export default class Time {
 	 * @example Time.formatDateWithPadding(new Date(), true);
 	 * @example Time.formatDateWithPadding(new Date(), true, true);
 	 */
-	static formatDateWithPadding(d: Date | number = new Date(), hms = true, ms = false, words = false, useLang = false) {
-		const months = [
-			"January", "February", "March", "April",
-			"May", "June", "July", "August",
-			"September", "October", "November", "December"
-		];
-		const days = [
-			"Sunday", "Monday", "Tuesday",
-			"Wednesday", "Thursday", "Friday",
-			"Saturday"
-		];
+	static formatDateWithPadding(d: Date | number = new Date(), hms = true, millis = false, words = false, useLang = false) {
 		if (typeof d === "number") d = new Date(d);
-		if (words) return `${useLang ? `{lang:other.dayOfWeek.${d.getDay()}}` : days[d.getDay()]} ${useLang ? `{lang:other.months.${d.getMonth()}}` : months[d.getMonth()]} ${(d.getDate()).toString().padStart(2, "0")}, ${d.getFullYear()} ${d.getHours() % 12} ${useLang ? `{lang:other.words.${d.getHours() < 12 ? "am" : "pm"}$upper$}` : d.getHours() < 12 ? "AM" : "PM"}`;
-		else return `${(d.getMonth() + 1).toString().padStart(2, "0")}/${(d.getDate()).toString().padStart(2, "0")}/${d.getFullYear()}${hms ? ` ${(d.getHours()).toString().padStart(2, "0")}:${(d.getMinutes()).toString().padStart(2, "0")}:${(d.getSeconds()).toString().padStart(2, "0")}` : ""}${ms ? `.${(d.getMilliseconds()).toString().padStart(3, "0")}` : ""}`;
+		const months = [
+				"January", "February", "March", "April",
+				"May", "June", "July", "August",
+				"September", "October", "November", "December"
+			],
+			days = [
+				"Sunday", "Monday", "Tuesday",
+				"Wednesday", "Thursday", "Friday",
+				"Saturday"
+			],
+			h = d.getHours() % 12;
+		if (words) return `${useLang ? `{lang:other.dayOfWeek.${d.getDay()}}` : days[d.getDay()]} ${useLang ? `{lang:other.months.${d.getMonth()}}` : months[d.getMonth()]} ${(d.getDate()).toString().padStart(2, "0")}, ${d.getFullYear()} ${h  === 0 ? 12 : h} ${useLang ? `{lang:other.words.${d.getHours() < 12 ? "am" : "pm"}$upper$}` : d.getHours() < 12 ? "AM" : "PM"}`;
+		else return `${(d.getMonth() + 1).toString().padStart(2, "0")}/${(d.getDate()).toString().padStart(2, "0")}/${d.getFullYear()}${hms ? ` ${(h  === 0 ? 12 : h).toString().padStart(2, "0")}:${(d.getMinutes()).toString().padStart(2, "0")}:${(d.getSeconds()).toString().padStart(2, "0")}` : ""}${millis ? `.${(d.getMilliseconds()).toString().padStart(3, "0")}` : ""}`;
 	}
 
 	/**
@@ -154,9 +160,9 @@ export default class Time {
 	 * @example Time.secondsToHMS(1800);
 	 */
 	static secondsToHMS(sec: number) {
-		let hours: string | number = Math.floor(sec / 3600);
-		let minutes: string | number = Math.floor((sec - (hours * 3600)) / 60);
-		let seconds: string | number = Math.floor(sec - (hours * 3600) - (minutes * 60));
+		let hours: string | number = Math.floor(sec / 3600),
+			minutes: string | number = Math.floor((sec - (hours * 3600)) / 60),
+			seconds: string | number = Math.floor(sec - (hours * 3600) - (minutes * 60));
 
 		if (hours < 10) hours = `0${hours}`;
 		if (minutes < 10) minutes = `0${minutes}`;
@@ -166,14 +172,15 @@ export default class Time {
 
 	/**
 	 * Parse a string into milliseconds
+	 *
 	 * @param {string} str - the string to parse
-	 * @returns {number} 
+	 * @returns {number}
 	 */
 	static parseTime(str: string) {
 		return str
 			.split(",")
-			.map(v => ms(v.replace(/and/gi, "").toLowerCase().trim()))
-			.filter(v => v !== undefined)
+			.map((v) => ms(v.replace(/and/gi, "").toLowerCase().trim()))
+			.filter((v) => v !== undefined)
 			.reduce((a, b) => a + b, 0);
 	}
 }

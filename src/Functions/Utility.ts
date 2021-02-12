@@ -1,6 +1,6 @@
-import * as os from "os";
-import y from "yargs";
 import Redis from "../Other/Redis";
+import { AnyObject } from "../Other/Types";
+import * as os from "os";
 
 export default class Utility {
 	private constructor() {
@@ -17,32 +17,35 @@ export default class Utility {
 	 * @memberof Utility
 	 * @example Utility.toStringFormat(new Error());
 	 */
-	static toStringFormat<T extends object>(d: T, names: {
-		test<T>(obj: T): boolean;
-		props: string[];
-	}[]) {
-		function format(obj: T, props: string[]) {
-			const str: [string, string][] = [] as any;
+	static toStringFormat<T extends AnyObject = AnyObject>(d: T, names: Array<{
+		test<V>(obj: V): boolean;
+		props: Array<string>;
+	}>) {
+		function format(obj: AnyObject, props: Array<string>) {
+			const str: Array<[string, string]> = [];
 			for (const p of props) {
-				if ((obj as any)[p] instanceof Object) {
+				if (obj[p] instanceof Object) {
 					let f = false;
 					for (const o of names) {
-						if (o.test((obj as any)[p])) {
+						if (o.test(obj[p])) {
 							f = true;
-							str.push([p, format((obj as any)[p], o.props)]);
+							str.push([p, format(obj[p] as AnyObject, o.props)]);
 						} else continue;
 					}
-					if (!f) str.push([p, (obj as any)[p].toString()]);
-				} else str.push([p, (obj as any)[p]]);
+
+					if (!f) str.push([p, (obj as AnyObject<string>)[p].toString()]);
+				} else str.push([p, (obj as AnyObject<string>)[p]]);
 			}
 
-			return `<${obj.constructor.name}${str.reduce((a, b) => typeof b[1] === "string" && ["<"].some(j => !b[1].startsWith(j)) ? `${a} ${b[0]}="${b[1]}"` : `${a} ${b[0]}=${b[1]}`, "")}>`;
+
+			return `<${obj.constructor.name}${str.reduce((a, b) => typeof b[1] === "string" && ["<"].some((j) => !b[1].startsWith(j)) ? `${a} ${b[0]}="${b[1]}"` : `${a} ${b[0]}=${b[1]}`, "")}>`;
 		}
 
 		for (const o of names) {
 			if (o.test(d)) return format(d, o.props);
 			else continue;
 		}
+
 
 		return d.toString();
 	}
@@ -56,7 +59,7 @@ export default class Utility {
 	 * @memberof Utility
 	 * @example Utility.getLongestString(["hi", "hello"]);
 	 */
-	static getLongestString(arr: (string | number)[]) {
+	static getLongestString(arr: Array<string | number>) {
 		let longest = 0;
 		for (const v of arr) if (v.toString().length > longest) longest = v.toString().length;
 		return longest;
@@ -77,12 +80,12 @@ export default class Utility {
 	 * @memberof Utility
 	 * @example Utility.getPercents([1, 5, 4, 2]);
 	 */
-	static getPercents(arr: number[]) {
-		const total = arr.reduce((a, b) => a + b, 0);
-		const a: {
-			input: number;
-			percent: string;
-		}[] = [];
+	static getPercents(arr: Array<number>) {
+		const total = arr.reduce((a, b) => a + b, 0),
+			a: Array<{
+				input: number;
+				percent: string;
+			}> = [];
 		for (const v of arr) {
 			let s = (Math.round(((v / total) * 100) * 10) / 10).toString();
 			if (s.indexOf(".") === -1) s = s.padStart(2, "0");
@@ -112,7 +115,7 @@ export default class Utility {
 	 * @example Utility.getKeys("some:pattern", "0");
 	 * @example Utility.getKeys("some:pattern", "0", null, 10000);
 	 */
-	static async getKeys(pattern: string, cur = "0", keys = [] as string[], maxPerRun = 10000): Promise<string[]> {
+	static async getKeys(pattern: string, cur = "0", keys = [] as Array<string>, maxPerRun = 10000): Promise<Array<string>> {
 		if (!Redis.initialized) throw new TypeError("Redis has not been initialized.");
 		const s = await Redis.r.scan(cur, "MATCH", pattern, "COUNT", maxPerRun);
 		keys.push(...s[1]);
@@ -148,7 +151,7 @@ export default class Utility {
 		let total = 0, idle = 0;
 
 		for (const { times } of c) {
-			Object.values(times).map(t => total += t);
+			Object.values(times).map((t) => total += t);
 			idle += times.idle;
 		}
 
@@ -170,7 +173,7 @@ export default class Utility {
 	 */
 	static async getCPUUsage() {
 		const { idleAverage: i1, totalAverage: t1 } = this.getCPUInfo();
-		await new Promise((a, b) => setTimeout(a, 1e3));
+		await new Promise((a) => setTimeout(a, 1e3));
 		const { idleAverage: i2, totalAverage: t2 } = this.getCPUInfo();
 
 		return (10000 - Math.round(10000 * (i2 - i1) / (t2 - t1))) / 100;
@@ -180,45 +183,47 @@ export default class Utility {
 		[k in K]: number;
 	}) {
 		const items = Object.keys(values);
-		let chances: number[] = Object.values(values);
+		let chances: Array<number> = Object.values(values);
 		const sum = chances.reduce((a, b) => a + b, 0);
 		let b = 0;
-		chances = chances.map(a => (b = a + b));
+		chances = chances.map((a) => (b = a + b));
 		const rand = Math.random() * sum;
-		return items[chances.filter(el => el <= rand).length] as K;
+		return items[chances.filter((el) => el <= rand).length] as K;
 	}
 
 	/**
 	 * Merge two objects into one
+	 *
 	 * @param {A} a - The object to merge properties on to
 	 * @param {B} b - The object to merge properties from
 	 * @template A
 	 * @template B
 	 */
-	static mergeObjects<A extends object, B extends object>(a: A, b: B) {
+	// I hate the way this function looks, but I would much rather do all of that than rewrite this function to be properly typesafe
+	static mergeObjects<A extends AnyObject, B extends AnyObject>(a: A, b: B) {
 		// avoid references
-		const obj = JSON.parse(JSON.stringify(a)) as A & B;
-
-		// I hate this, but I would much rather do that than rewrite this function
-		const c = obj as any;
-		const d = a as any;
-		const e = b as any;
+		const obj = JSON.parse(JSON.stringify(a)) as A & B,
+			c = obj as AnyObject,
+			d = a as AnyObject,
+			e = b as AnyObject;
 		for (const k of Object.keys(b)) {
 			// handling arrays is a tricky thing since we can't just merge them because of duplicates, so we'll just assume arrays will be zero length if they're "wrong"
-			if (Array.isArray(e[k])) c[k] = d[k] && d[k]?.length !== 0 ? d[k] : e[k];
+			if (Array.isArray(e[k])) c[k] = d[k] && (d as AnyObject<string>)[k]?.length !== 0 ? d[k] : e[k];
 			else if (typeof e[k] === "object" && e[k] !== null) {
 				if (typeof d[k] !== "object" || d[k] === null) d[k] = {};
-				c[k] = this.mergeObjects(d[k], e[k]);
+				c[k] = this.mergeObjects((d as AnyObject<AnyObject>)[k], (e as AnyObject<AnyObject>)[k]);
 			} else c[k] = typeof d[k] === "undefined" ? e[k] : d[k];
 		}
+
+
 		return obj;
 	}
 
-	static average<O extends { time: number; type: T; } = any, T extends string = string>(items: O[], sampleSize?: number, type?: T) {
+	static average<O extends { time: number; type: T; } = never, T extends string = string>(items: Array<O>, sampleSize?: number, type?: T) {
 		const s: {
 			[k: number]: number;
 		} = {};
-		if (type) items = items.filter(i => i.type === type);
+		if (type) items = items.filter((i) => i.type === type);
 
 		for (const v of items) {
 			const sec = Number(Math.floor(v.time / 1000).toString().slice(-1));
