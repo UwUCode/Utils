@@ -1,11 +1,11 @@
 {
   "name": "@uwu-codes/utils",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "General utilities I use.",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
   "scripts": {
-    "prepare": "rm -rf build && npm run lint && tsc && echo Build Finished",
+    "prepare": "rm -rf build && npm run lint && tsc && cp src/Other/Types.d.ts build/src/Other/ && echo Build Finished",
     "build": "npm run prepare",
     "lint": "eslint . --ext .ts --fix"
   },
