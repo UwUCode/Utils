@@ -22,7 +22,7 @@ export type DeepPartial<T> = {
 };
 export type ThenArg<T> = T extends PromiseLike<infer U> ? U : T;
 export type ThenReturnType<T extends (...args: any) => any> = ThenArg<ReturnType<T>>;
-export type OmitFirstArg<F> = F extends (x: unknown, ...args: infer P) => infer R ? (...args: P) => R : never;
+export type OmitFirstArg<T> = T extends (x: any, ...args: infer P) => infer R ? (...args: P) => R : never;
 export type valueof<T> = T[keyof T];
 export type ArrayOrObject<T = unknown> = Array<T> | { [K in keyof T]: T[K]; };
 export type Nullable<T, I = never> = { [K in keyof T]: K extends I ? T[K] : T[K] extends AnyObject ? Nullable<T[K]> : T[K] | null; };
