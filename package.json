@@ -1,13 +1,14 @@
 {
   "name": "@uwu-codes/utils",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "description": "General utilities I use.",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
   "scripts": {
-    "prepare": "rm -rf build && npm run lint && tsc && cp src/Other/Types.d.ts build/src/Other/ && echo Build Finished",
+    "prepare": "rm -rf build && npm run lint && tsc && npm run copy-types && echo Build Finished",
     "build": "npm run prepare",
-    "lint": "eslint . --ext .ts --fix"
+    "lint": "eslint . --ext .ts --fix",
+    "copy-types": "cp src/Other/Types.d.ts build/src/Other/ && sed -i '/__exportStar(require(\".\\/Other\\/Types\"), exports);/c\\' build/src/index.js"
   },
   "author": "Donovan_DMC",
   "license": "MIT",
@@ -26,7 +27,7 @@
     "@types/ms": "^0.7.31",
     "@types/node": "^14.14.27",
     "@types/yargs": "^16.0.0",
-    "@uwu-codes/eslint-config": "^1.0.4",
+    "@uwu-codes/eslint-config": "^1.0.5",
     "@uwu-codes/tsconfig": "^1.0.1"
   },
   "dependencies": {

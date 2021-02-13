@@ -27,7 +27,7 @@ export default class JSON5Helper {
 		try {
 			(m as NodeJS.Module & {exports: unknown; }).exports = (JSON5.parse as AnyFunction<[string], unknown>)(content);
 		} catch (err) {
-			if(err instanceof Error) {
+			if (err instanceof Error) {
 				err.message = `${filename}: ${err.message}`;
 				throw err;
 			} else throw err;
