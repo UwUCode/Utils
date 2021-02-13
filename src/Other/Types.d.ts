@@ -38,3 +38,4 @@ export type AnyFunction<A extends Array<unknown> = Array<unknown>, B = unknown> 
 export interface ModuleImport<T> {
 	default: T;
 }
+export type PartialRecord<K extends string | number | symbol, T> = Partial<Record<K, T>>;
