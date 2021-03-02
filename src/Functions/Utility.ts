@@ -238,4 +238,24 @@ export default class Utility {
 			sample
 		};
 	}
+
+	static roundExponent(exp: number, num: number) {
+		return Math.pow(exp, Math.round(Math.log(num) / Math.log(exp)));
+	}
+
+	static calcHeightSlice(slices: number, height: number) {
+		const res: Array<number> = [];
+		for (let i = 1; i <= slices; i++) for (let ii = 1; ii <= slices; ii++) res.push((height / slices) * i);
+		return res;
+	}
+
+	static calcWidthSlice(slices: number, width: number) {
+		const res: Array<number> = [];
+		for (let i = 1; i <= slices; i++) for (let ii = 1; ii <= slices; ii++) res.push((width / slices) * ii);
+		return res;
+	}
+
+	static calcSlices(slices: number, width: number, height: number): [width: Array<number>, height: Array<number>] {
+		return [this.calcWidthSlice(slices, width), this.calcHeightSlice(slices, height)];
+	}
 }
