@@ -255,7 +255,11 @@ export default class Utility {
 		return res;
 	}
 
-	static calcSlices(slices: number, width: number, height: number): [height: Array<number>, width: Array<number>] {
-		return [this.calcHeightSlice(slices, height), this.calcWidthSlice(slices, width)];
+	static calcSlices(slicesH: number, slicesW: number, height: number, width: number): [height: Array<number>, width: Array<number>] {
+		return [this.calcHeightSlice(slicesH, height), this.calcWidthSlice(slicesW, width)];
+	}
+
+	static calcSlicesSame(slices: number, height: number, width: number) {
+		return this.calcSlices(slices, slices, height, width);
 	}
 }
