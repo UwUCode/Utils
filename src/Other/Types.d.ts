@@ -39,3 +39,4 @@ export interface ModuleImport<T> {
 	default: T;
 }
 export type PartialRecord<K extends string | number | symbol, T> = Partial<Record<K, T>>;
+export type KeysOfUnion<T> = T extends T ? keyof T : never;
