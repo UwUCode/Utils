@@ -35,7 +35,7 @@ export type KnownKeys<T> = {
 } extends { [_ in keyof T]: infer U } ? U : never;
 export type AnyObject<T = unknown> = Record<string, T>;
 export type AnyFunction<A extends Array<unknown> = Array<unknown>, B = unknown> = (...args: A) => B;
-export type ModuleImport<T, V extends boolean = false> = Record<"default", T> | (V extends true ? T : never);
+export type ModuleImport<T> = Record<"default", T>;
 export type PartialRecord<K extends string | number | symbol, T> = Partial<Record<K, T>>;
 export type KeysOfUnion<T> = T extends T ? keyof T : never;
 export type ValuesOfUnion<T> = T extends T ? T[keyof T] : never;
