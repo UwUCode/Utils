@@ -8,6 +8,8 @@ import Timers from "./Other/Timers";
 import JSON5Helper from "./Other/JSON5Helper";
 import SessionStore from "./Other/SessionStore";
 import IORedis from "./Other/Redis";
+import ReNice from "./Other/ReNice";
+import pid from "./Other/pid";
 export * from "./Other/Types";
 const Redis = IORedis.r;
 
@@ -45,5 +47,7 @@ export {
 	Variables,
 	Timers,
 	JSON5Helper,
-	SessionStore
+	SessionStore,
+	ReNice,
+	pid
 };

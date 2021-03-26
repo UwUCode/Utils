@@ -41,3 +41,6 @@ export interface ModuleImport<T> {
 export type PartialRecord<K extends string | number | symbol, T> = Partial<Record<K, T>>;
 export type KeysOfUnion<T> = T extends T ? keyof T : never;
 export type ValuesOfUnion<T> = T extends T ? T[keyof T] : never;
+export type Writeable<T extends { [k in string | number | symbol]: unknown; }, K extends (string | number | symbol) = keyof T> = {
+	[P in K]: T[P];
+};
