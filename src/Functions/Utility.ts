@@ -1,5 +1,5 @@
-import Redis from "../Other/Redis";
 import { AnyObject } from "../Other/Types";
+import { Variables } from "..";
 import * as os from "os";
 
 export default class Utility {
@@ -116,8 +116,8 @@ export default class Utility {
 	 * @example Utility.getKeys("some:pattern", "0", null, 10000);
 	 */
 	static async getKeys(pattern: string, cur = "0", keys = [] as Array<string>, maxPerRun = 10000): Promise<Array<string>> {
-		if (!Redis.initialized) throw new TypeError("Redis has not been initialized.");
-		const s = await Redis.r.scan(cur, "MATCH", pattern, "COUNT", maxPerRun);
+		if (!Variables.REDIS) throw new TypeError("Redis has not been initialized.");
+		const s = await Variables.REDIS.scan(cur, "MATCH", pattern, "COUNT", maxPerRun);
 		keys.push(...s[1]);
 		if (s[0] !== "0") return this.getKeys(pattern, s[0], keys, maxPerRun);
 		else return keys;
