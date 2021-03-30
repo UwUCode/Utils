@@ -1,3 +1,4 @@
+import Logger from "logger";
 import { performance } from "perf_hooks";
 import crypto from "crypto";
 
@@ -35,7 +36,7 @@ export default class Timers {
 		this.timers[label].end = parseFloat(performance.now().toFixed(3));
 		if (this.log) {
 			// Logger.info(`Timers[${this.id}]`, `Timer with label ${label} ended.`);
-			console.debug(`Timers[${this.id}]`, `${label} took ${this.calc(label, label)}ms`);
+			Logger.debug(`Timers[${this.id}]`, `${label} took ${this.calc(label, label)}ms`);
 		}
 		return this.timers[label].end;
 	}

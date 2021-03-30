@@ -18,10 +18,6 @@ export default class Strings {
 
 	static formatString(str: string, formatArgs: Array<string | number>) {
 		formatArgs.map((a, i) => {
-			// console.log("1", new RegExp(`\\{${i}\\}`, "g"));
-			// console.log("2", str);
-			// console.log("3", a);
-			// console.log("4", str?.replace(new RegExp(`\\{${i}\\}`, "g"), a?.toString()));
 			str = str?.replace(new RegExp(`\\{${i}\\}`, "g"), a?.toString());
 		});
 		return str;
