@@ -1,5 +1,6 @@
 import { AnyObject } from "../Other/Types";
 import ms from "ms";
+import chunk from "chunk";
 
 export interface MsResponse {
 	ms: number;
@@ -182,5 +183,25 @@ export default class Time {
 			.map((v) => ms(v.replace(/and/gi, "").toLowerCase().trim()))
 			.filter((v) => v !== undefined)
 			.reduce((a, b) => a + b, 0);
+	}
+
+	/**
+	 * Parse time, but with proper word support (experimental!)
+	 *
+	 * @param {string} str - The string to parse
+	 * @returns {number}
+	 */
+	static parseTime2(str: string) {
+		const s = str.replace(/and/gi, "").toLowerCase().trim().split(" ");
+		if (s.length === 0) return ms(s[0]);
+		let t = 0;
+		// we run over them in pairs, since most people that will use "5 seconds" will
+		// use the same for all values they provide
+		chunk(s, 2).map(v => t += (ms(v.join(" ").trim()) ?? 0));
+		// we run back over it for things like 5m, and we assume numbers on their own
+		// had an identifier after, and were already handled
+		s.map(v => t += !isNaN(Number(v.trim())) ? 0 : (ms(v.trim()) ?? 0));
+
+		return t;
 	}
 }

@@ -3,7 +3,8 @@
     "compilerOptions": {
         "outDir": "./build",
         "baseUrl": "./src",
-        "declaration": true
+        "declaration": true,
+        "inlineSourceMap": false
     },
     "include": [
         "src/**/*"

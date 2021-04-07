@@ -2,7 +2,7 @@ import Variables from "../Other/Variables";
 import * as fs from "fs-extra";
 import * as http from "http";
 import * as https from "https";
-import {URL} from "url";
+import { URL } from "url";
 
 export default class Request {
 	private constructor() {
