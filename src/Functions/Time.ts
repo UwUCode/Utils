@@ -192,7 +192,7 @@ export default class Time {
 	 * @returns {number}
 	 */
 	static parseTime2(str: string) {
-		const s = str.replace(/and/gi, "").toLowerCase().trim().split(" ");
+		const s = str.replace(/and/gi, "").toLowerCase().trim().split(" ").filter(Boolean);
 		if (s.length === 0) return ms(s[0]);
 		let t = 0;
 		// we run over them in pairs, since most people that will use "5 seconds" will
