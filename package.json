@@ -1,6 +1,6 @@
 {
   "name": "@uwu-codes/utils",
-  "version": "1.0.26",
+  "version": "1.0.27",
   "description": "General utilities I use.",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -46,5 +46,13 @@
   "private": false,
   "publishConfig": {
     "access": "public"
-  }
+  },
+  "engines": {
+    "node": ">=16.x",
+    "npm": ">=7.x"
+  },
+  "os": [
+    "linux"
+  ],
+  "engineStrict": true
 }
