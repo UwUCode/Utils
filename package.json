@@ -1,12 +1,12 @@
 {
   "name": "@uwu-codes/utils",
-  "version": "1.0.25",
+  "version": "1.0.26",
   "description": "General utilities I use.",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
   "scripts": {
-    "prepare": "rm -rf build && npm run lint && tsc && npm run copy-types && echo Build Finished",
-    "build": "npm run prepare",
+    "prepublishOnly": "rm -rf build && npm run lint && tsc && npm run copy-types && echo Build Finished",
+    "build": "npm run prepublishOnly",
     "lint": "eslint . --ext .ts --fix",
     "copy-types": "cp src/Other/Types.d.ts build/src/Other/ && sed -i '/__exportStar(require(\".\\/Other\\/Types\"), exports);/c\\' build/src/index.js"
   },
@@ -23,24 +23,24 @@
   "devDependencies": {
     "@types/chunk": "*",
     "@types/dot-object": "^2.1.2",
-    "@types/fs-extra": "^9.0.9",
+    "@types/fs-extra": "^9.0.11",
     "@types/json5": "^0.0.30",
     "@types/ms": "^0.7.31",
-    "@types/node": "^14.14.37",
+    "@types/node": "^14.14.41",
     "@types/yargs": "^16.0.1",
-    "@uwu-codes/eslint-config": "^1.0.8",
+    "@uwu-codes/eslint-config": "^1.0.12",
     "@uwu-codes/tsconfig": "^1.0.1"
   },
   "dependencies": {
-    "@types/ioredis": "^4.22.1",
+    "@types/ioredis": "^4.22.3",
     "chunk": "^0.0.3",
     "dot-object": "^2.1.4",
     "fs-extra": "^9.1.0",
-    "ioredis": "^4.24.5",
+    "ioredis": "^4.26.0",
     "json5": "^2.2.0",
-    "logger": "npm:@uwu-codes/logger@^1.0.12",
+    "logger": "npm:@uwu-codes/logger@^1.0.14",
     "ms": "^2.1.3",
-    "typescript": "^4.2.3",
+    "typescript": "beta",
     "yargs": "^16.2.0"
   },
   "private": false,

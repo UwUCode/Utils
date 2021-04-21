@@ -1,6 +1,6 @@
 import { AnyObject } from "../Other/Types";
 import { Variables } from "..";
-import * as os from "os";
+import * as os from "node:os";
 
 export default class Utility {
 	private constructor() {
