@@ -12,5 +12,7 @@ export default function pid(path: string) {
 		}
 	}
 
-	process.once("exit", remove.bind(null));
+	process
+		.once("exit", remove.bind(null))
+		.once("SIGINT", remove.bind(null));
 }
