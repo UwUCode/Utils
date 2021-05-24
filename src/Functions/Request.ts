@@ -1,8 +1,8 @@
 import Variables from "../Other/Variables";
 import * as fs from "fs-extra";
-import * as http from "node:http";
-import * as https from "node:https";
-import { URL } from "node:url";
+import * as http from "http";
+import * as https from "https";
+import { URL } from "url";
 
 export default class Request {
 	private constructor() {

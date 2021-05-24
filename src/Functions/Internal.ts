@@ -2,8 +2,8 @@ import { AnyFunction } from "../Other/Types";
 import ts from "typescript";
 import * as fs from "fs-extra";
 import JSON5 from "json5";
-import * as os from "node:os";
-import { execSync } from "node:child_process";
+import * as os from "os";
+import { execSync } from "child_process";
 
 export default class Internal {
 	private constructor() {

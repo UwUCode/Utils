@@ -1,6 +1,6 @@
 import Logger from "logger";
-import { performance } from "node:perf_hooks";
-import crypto from "node:crypto";
+import { performance } from "perf_hooks";
+import crypto from "crypto";
 
 interface Timer {
 	start: number | null;

@@ -1,5 +1,5 @@
 import * as fs from "fs-extra";
-import { dirname } from "node:path";
+import { dirname } from "path";
 export default function pid(path: string) {
 	const b = dirname(path);
 	if (!fs.existsSync(b)) fs.mkdirpSync(b);

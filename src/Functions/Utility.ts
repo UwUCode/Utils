@@ -1,6 +1,6 @@
 import { AnyObject } from "../Other/Types";
 import { Variables } from "..";
-import * as os from "node:os";
+import * as os from "os";
 
 export default class Utility {
 	private constructor() {
@@ -261,5 +261,12 @@ export default class Utility {
 
 	static calcSlicesSame(slices: number, height: number, width: number) {
 		return this.calcSlices(slices, slices, height, width);
+	}
+
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	static definePropertyIfNotPresent<T>(obj: T, prop: PropertyKey, attr: PropertyDescriptor & ThisType<any>): boolean {
+		if (prop in obj) return false;
+		Object.defineProperty(obj, prop, attr);
+		return true;
 	}
 }
