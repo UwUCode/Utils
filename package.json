@@ -1,6 +1,6 @@
 {
   "name": "@uwu-codes/utils",
-  "version": "1.0.36",
+  "version": "1.0.37",
   "description": "General utilities I use.",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -39,7 +39,7 @@
     "fs-extra": "^10.0.0",
     "ioredis": "^4.27.3",
     "json5": "^2.2.0",
-    "logger": "npm:@uwu-codes/logger@^1.0.21",
+    "logger": "npm:@uwu-codes/logger@^1.0.22",
     "ms": "^2.1.3",
     "yargs": "^17.0.1"
   },
