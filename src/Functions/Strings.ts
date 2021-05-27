@@ -52,8 +52,19 @@ export default class Strings {
 	 *
 	 * @param {string} str - the string to truncate
 	 * @param {number} limit - the location to truncate at
+	 * @returns {string}
 	 */
 	static truncate(str: string, limit: number) {
 		return str.length > limit ? `${str.slice(limit - 6)} (...)` : str;
+	}
+
+	/**
+	 * Convert camelCase to snake_case
+	 *
+	 * @param {string} str - The string to change
+	 * @returns {string}
+	 */
+	static camelCaseToSnakeCase(str: string) {
+		return str.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
 	}
 }

@@ -17,18 +17,23 @@ export default class Utility {
 	 * @memberof Utility
 	 * @example Utility.toStringFormat(new Error());
 	 */
-	static toStringFormat<T extends AnyObject = AnyObject>(d: T, names: Array<{
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	static toStringFormat<T = any>(d: T, names: Array<{
 		test<V>(obj: V): boolean;
 		props: Array<string>;
 	}>) {
-		function format(obj: AnyObject, props: Array<string>) {
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		function format(obj: any, props: Array<string>) {
 			const str: Array<[string, string]> = [];
 			for (const p of props) {
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 				if (obj[p] instanceof Object) {
 					let f = false;
 					for (const o of names) {
+						// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 						if (o.test(obj[p])) {
 							f = true;
+							// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 							str.push([p, format(obj[p] as AnyObject, o.props)]);
 						} else continue;
 					}
@@ -38,6 +43,7 @@ export default class Utility {
 			}
 
 
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/restrict-template-expressions
 			return `<${obj.constructor.name}${str.reduce((a, b) => typeof b[1] === "string" && ["<"].some((j) => !b[1].startsWith(j)) ? `${a} ${b[0]}="${b[1]}"` : `${a} ${b[0]}=${b[1]}`, "")}>`;
 		}
 
@@ -47,7 +53,7 @@ export default class Utility {
 		}
 
 
-		return d.toString();
+		return String(d);
 	}
 
 	/**
