@@ -48,3 +48,9 @@ export type ValuesOfUnion<T> = T extends T ? T[keyof T] : never;
 export type Writeable<T extends { [k in string | number | symbol]: unknown; }, K extends (string | number | symbol) = keyof T> = {
 	[P in K]: T[P];
 };
+type DeepUnion<T, V> = {
+	[P in keyof T]: DeepUnion<T[P], V> | V;
+};
+export type DeepRequired<T> = {
+	[P in keyof T]?: Required<T[P]>;
+};
