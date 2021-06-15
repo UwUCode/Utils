@@ -1,14 +1,13 @@
 {
   "name": "@uwu-codes/utils",
-  "version": "1.0.40",
+  "version": "1.0.42",
   "description": "General utilities I use.",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
   "scripts": {
-    "prepublishOnly": "rm -rf build && npm run lint && tsc && npm run copy-types && echo Build Finished",
+    "prepublishOnly": "rm -rf build && npm run lint && tsc && echo Build Finished",
     "build": "npm run prepublishOnly",
-    "lint": "eslint . --ext .ts --fix",
-    "copy-types": "cp src/Other/Types.d.ts build/src/Other/ && sed -i '/__exportStar(require(\".\\/Other\\/Types\"), exports);/c\\' build/src/index.js"
+    "lint": "eslint . --ext .ts --fix"
   },
   "author": "Donovan_DMC",
   "license": "MIT",
@@ -34,6 +33,7 @@
   },
   "dependencies": {
     "@types/ioredis": "^4.26.4",
+    "@uwu-codes/types": "^1.0.0",
     "chunk": "^0.0.3",
     "dot-object": "^2.1.4",
     "fs-extra": "^10.0.0",
@@ -48,7 +48,7 @@
     "access": "public"
   },
   "engines": {
-    "node": ">=16.x",
+    "node": ">=15.x",
     "npm": ">=7.x"
   },
   "os": [

@@ -10,7 +10,6 @@ import SessionStore from "./Other/SessionStore";
 import IORedis from "./Other/Redis";
 import ReNice from "./Other/ReNice";
 import pid from "./Other/pid";
-export * from "./Other/Types";
 const Redis = IORedis.r;
 
 interface List {
@@ -25,9 +24,7 @@ function setValue<K extends keyof List>(key: K, val: List[K]) {
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 	Variables[
 		key === "userAgent" ? "USER_AGENT" :
-			key === "pastebin.devKey" ? "DEV_KEY" :
-				key === "pastebin.userKey" ? "USER_KEY" :
-					key === "redis" ? "REDIS" : null as never
+			key === "redis" ? "REDIS" : null as never
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	] = val as any;
 

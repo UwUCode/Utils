@@ -1,7 +1,7 @@
 /* eslint-disable deprecation/deprecation */
-import { AnyFunction } from "./Types";
 import JSON5 from "json5";
 import fs from "fs-extra";
+import { AnyFunction } from "@uwu-codes/types";
 
 export default class JSON5Helper {
 	private static JSON_ORIGINAL: ((m: NodeJS.Module, filename: string) => unknown) | undefined;

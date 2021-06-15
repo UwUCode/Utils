@@ -67,4 +67,27 @@ export default class Strings {
 	static camelCaseToSnakeCase(str: string) {
 		return str.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
 	}
+	/**
+	 * Returns the provided string with an s provided if the array length is not 1
+	 *
+	 * @param {string} str - the provided string
+	 * @param {Array<any> | number} arr - the provided array or number
+	 * @returns {string}
+	 */
+	static plural(str: string, val: ArrayLike<unknown> | number) {
+		return `${str}${(Array.isArray(val) ? val.length : val) !== 1 ? "s" : ""}`;
+	}
+
+	/**
+	 * Returns the array joined together with an and
+	 *
+	 * @param {Array<string>} arr - the provided array
+	 * @returns {string}
+	 */
+	static joinAnd(arr: Array<unknown>, joiner = ", ") {
+		if (arr.length === 1) return String(arr[0]);
+		const last = arr.splice(arr.length - 1, 1)[0];
+		// eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+		return `${arr.join(joiner)}, and ${last}`;
+	}
 }

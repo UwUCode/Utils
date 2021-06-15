@@ -1,5 +1,5 @@
-import { AnyObject } from "../Other/Types";
 import { Variables } from "..";
+import { AnyObject } from "@uwu-codes/types";
 import * as os from "os";
 
 export default class Utility {
@@ -204,6 +204,7 @@ export default class Utility {
 	 * @param {B} b - The object to merge properties from
 	 * @template A
 	 * @template B
+	 * @returns {A & B}
 	 */
 	// I hate the way this function looks, but I would much rather do all of that than rewrite this function to be properly typesafe
 	static mergeObjects<A extends AnyObject, B extends AnyObject>(a: A, b: B) {
@@ -220,7 +221,6 @@ export default class Utility {
 				c[k] = this.mergeObjects((d as AnyObject<AnyObject>)[k], (e as AnyObject<AnyObject>)[k]);
 			} else c[k] = typeof d[k] === "undefined" ? e[k] : d[k];
 		}
-
 
 		return obj;
 	}
@@ -274,5 +274,17 @@ export default class Utility {
 		if (prop in obj) return false;
 		Object.defineProperty(obj, prop, attr);
 		return true;
+	}
+
+	/**
+	 * Check if the provided object is of the type
+	 *
+	 * @param {object} obj - the object to test
+	 * @param {Function} type - the type to test against
+	 * @returns
+	 */
+	// eslint-disable-next-line @typescript-eslint/ban-types
+	static isOfType<T extends Function>(obj: unknown, type: T): obj is T {
+		return obj instanceof type;
 	}
 }

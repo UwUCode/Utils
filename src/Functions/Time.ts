@@ -1,6 +1,6 @@
-import { AnyObject } from "../Other/Types";
 import ms from "ms";
 import chunk from "chunk";
+import { AnyObject } from "@uwu-codes/types";
 
 export interface MsResponse {
 	ms: number;
@@ -203,5 +203,38 @@ export default class Time {
 		s.map(v => t += !isNaN(Number(v.trim())) ? 0 : (ms(v.trim()) ?? 0));
 
 		return t;
+	}
+
+	/**
+	 * Get the number of days in a given month.
+	 *
+	 * Not zero based.
+	 *
+	 * @static
+	 * @param {number} month
+	 * @returns {number}
+	 * @memberof Internal
+	 * @example Time.getDaysInMonth(2);
+	 */
+	static getDaysInMonth(month: number) {
+		return new Date(new Date().getFullYear(), month, 0).getDate();
+	}
+
+	/**
+	 * Convert a date object into DD/MM/YYYY HH:MM:SS
+	 *
+	 * @param {(Date | number | string)} d - The object to convert
+	 * @returns {string}
+	 */
+	static dateToReadable(d: Date | number | string) {
+		if (!(d instanceof Date)) d = new Date(d);
+		return `${d.getMonth().toString().padStart(2, "0")}/\
+		${(d.getDate() + 1).toString().padStart(2, "0")}/\
+		${d.getFullYear()} \
+		${d.getHours().toString().padStart(2, "0")}:\
+		${d.getMinutes().toString().padStart(2, "0")}:\
+		${d.getSeconds().toString().padStart(2, "0")}`
+		// because the line splits include the tabs/spaces
+			.replace(/(\t|\s{2,4})/g, "");
 	}
 }
