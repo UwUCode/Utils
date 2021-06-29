@@ -1,6 +1,6 @@
 {
   "name": "@uwu-codes/utils",
-  "version": "1.0.42",
+  "version": "1.0.43",
   "description": "General utilities I use.",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -52,7 +52,8 @@
     "npm": ">=7.x"
   },
   "os": [
-    "linux"
+    "linux",
+    "win32"
   ],
   "engineStrict": true
 }
