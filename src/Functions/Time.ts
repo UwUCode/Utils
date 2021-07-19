@@ -107,11 +107,12 @@ export default class Time {
 	 * @param {("ms" | "mi" | "ns")} type
 	 * @returns {string}
 	 */
-	static convert(input: number, type: "ms" | "mi" | "ns"): string {
+	static convert(input: number, type: "ms" | "mi" | "ns", dec = 3): string {
+		input = parseFloat(input.toFixed(dec));
 		switch (type) {
 			case "ms": return input < 1000 ? `${input}ms` : this.ms(input, true, true, true);
-			case "mi": return input < 1000 ? `${input}µs` : this.convert(input / 1000, "ms");
-			case "ns": return input < 1000 ? `${input}ns` : this.convert(input / 1000, "mi");
+			case "mi": return input < 1000 ? `${input}µs` : this.convert(input / 1000, "ms", dec);
+			case "ns": return input < 1000 ? `${input}ns` : this.convert(input / 1000, "mi", dec);
 			// eslint-disable-next-line @typescript-eslint/restrict-template-expressions
 			default: return `${input}${type}`;
 		}
