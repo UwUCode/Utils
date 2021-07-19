@@ -38,6 +38,7 @@ export default class Time {
 		// @FIXME language :sweats:
 		if (time === 0) return words ? "0 seconds" : "0s";
 		const r = {
+			// Number.EPSILON = https://stackoverflow.com/a/11832950
 			ms: Math.round(((time % 1000) + Number.EPSILON) * 100) / 100,
 			s: 0,
 			m: 0,
@@ -79,9 +80,7 @@ export default class Time {
 					str.splice(str.indexOf(e), 1);
 					if (str.length < 1) str.push("less than 1 minute");
 				}
-			} else {
-				delete (r as AnyObject<number>).s;
-			}
+			} else delete (r as AnyObject<number>).s;
 		}
 
 
@@ -99,6 +98,23 @@ export default class Time {
 
 
 		return words ? str.reverse().join(", ") : Object.keys(r).filter((k) => (r as AnyObject<number>)[k] > 0).map((k) => `${Math.floor((r as AnyObject<number>)[k])}${k}`).reverse().reduce((a, b) => a + b, "");
+	}
+
+	/**
+	 * Convert ms/mi/ns to the highest possible value
+	 *
+	 * @param {number} input
+	 * @param {("ms" | "mi" | "ns")} type
+	 * @returns {string}
+	 */
+	static convert(input: number, type: "ms" | "mi" | "ns"): string {
+		switch (type) {
+			case "ms": return input < 1000 ? `${input}ms` : this.ms(input, true, true, true);
+			case "mi": return input < 1000 ? `${input}µs` : this.convert(input / 1000, "ms");
+			case "ns": return input < 1000 ? `${input}ns` : this.convert(input / 1000, "mi");
+			// eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+			default: return `${input}${type}`;
+		}
 	}
 
 	/**
