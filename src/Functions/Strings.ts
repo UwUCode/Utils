@@ -54,8 +54,8 @@ export default class Strings {
 	 * @param {number} limit - the location to truncate at
 	 * @returns {string}
 	 */
-	static truncate(str: string, limit: number) {
-		return str.length > limit ? `${str.slice(limit - 6)} (...)` : str;
+	static truncate(str: string, limit: number, ellipsis = true) {
+		return str.length > limit ? ellipsis === true ? `${str.slice(0 ,limit - 6)} (...)` : str.slice(0, limit) : str;
 	}
 
 	/**

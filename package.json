@@ -1,6 +1,6 @@
 {
   "name": "@uwu-codes/utils",
-  "version": "1.0.46",
+  "version": "1.0.47",
   "description": "General utilities I use.",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -22,18 +22,18 @@
   "devDependencies": {
     "@types/chunk": "*",
     "@types/dot-object": "^2.1.2",
-    "@types/fs-extra": "^9.0.11",
+    "@types/fs-extra": "^9.0.12",
     "@types/json5": "^0.0.30",
     "@types/ms": "^0.7.31",
-    "@types/node": "^15.12.5",
-    "@types/yargs": "^17.0.0",
+    "@types/node": "^16.4.0",
+    "@types/yargs": "^17.0.2",
     "@uwu-codes/eslint-config": "^1.0.18",
     "@uwu-codes/tsconfig": "^1.0.1",
-    "typescript": "^4.3.4"
+    "typescript": "^4.3.5"
   },
   "dependencies": {
-    "@types/ioredis": "^4.26.4",
-    "@uwu-codes/types": "^1.0.3",
+    "@types/ioredis": "^4.26.6",
+    "@uwu-codes/types": "^1.0.5",
     "chunk": "^0.0.3",
     "dot-object": "^2.1.4",
     "fs-extra": "^10.0.0",
