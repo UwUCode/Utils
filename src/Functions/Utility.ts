@@ -179,7 +179,8 @@ export default class Utility {
 	 */
 	static async getCPUUsage() {
 		const { idleAverage: i1, totalAverage: t1 } = this.getCPUInfo();
-		await new Promise((a) => setTimeout(a, 1e3));
+		//                                           what (https://butts-are.cool/Code_-_Insiders_07-22-2021_08-25-55.png)
+		await new Promise((a) => setTimeout(a, 1e3, undefined));
 		const { idleAverage: i2, totalAverage: t2 } = this.getCPUInfo();
 
 		return (10000 - Math.round(10000 * (i2 - i1) / (t2 - t1))) / 100;
