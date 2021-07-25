@@ -209,6 +209,7 @@ export default class Time {
 	 * @returns {number}
 	 */
 	static parseTime2(str: string) {
+		if (!str) return 0;
 		const s = str.replace(/and/gi, "").toLowerCase().trim().split(" ").filter(Boolean);
 		if (s.length === 0) return ms(s[0]);
 		let t = 0;
