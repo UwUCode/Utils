@@ -34,7 +34,7 @@ export default class Timers {
 		if (this.timers[label].end !== null) throw new TypeError(`[${this.id}] Timer with the label "${label}" has already ended.`);
 
 		this.timers[label].end = process.hrtime.bigint();
-		this.log(`Timers[${this.id}]`, `${label} took ${this.calc(label, dec)}ms`);
+		this.log(`Timers[${this.id}]`, `${label} took ${this.calc(label, dec)}`);
 		return this.timers[label].end!;
 	}
 
