@@ -5,6 +5,7 @@ import Time from "./Functions/Time";
 import Utility from "./Functions/Utility";
 import Variables from "./Other/Variables";
 import Timers from "./Other/Timers";
+import Timing from "./Other/Timing";
 import JSON5Helper from "./Other/JSON5Helper";
 import SessionStore from "./Other/SessionStore";
 import IORedis from "./Other/Redis";
@@ -43,6 +44,7 @@ export {
 	Redis,
 	Variables,
 	Timers,
+	Timing,
 	JSON5Helper,
 	SessionStore,
 	ReNice,
