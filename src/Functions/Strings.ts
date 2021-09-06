@@ -1,7 +1,4 @@
-// eslint-disable-next-line @typescript-eslint/triple-slash-reference
-/// <reference path="../@types/legal-ass.d.ts" />
-
-import LegalAss from "legal-ass";
+import LegalAss from "./LegalAss";
 
 export default class Strings {
 	private constructor() {
@@ -60,8 +57,8 @@ export default class Strings {
 	 * @param {boolean} [ellipses] - if ellipses should be included
 	 * @returns {string}
 	 */
-	static truncate(str: string, limit: number, ellipsis = true) {
-		return str.length > limit ? ellipsis === true ? `${str.slice(0, limit - 6)} (...)` : str.slice(0, limit) : str;
+	static truncate(str: string, len: number, ellipses = true) {
+		return str.length > len ? ellipses === true ? `${str.slice(0, len - 6)} (...)` : str.slice(0, len) : str;
 	}
 
 	// I'm using legal-ass just because of the name, this is easy to implement
@@ -73,12 +70,8 @@ export default class Strings {
 	 * @param {boolean} [ellipses] - if ellipses should be included
 	 * @returns {string}
 	 */
-	static truncateWords(str: string, limit: number, ellipsis = true) {
-		return LegalAss(str, {
-			length: limit,
-			splitWords: false,
-			ellipses: ellipsis === false ? "" : " (...)"
-		});
+	static truncateWords(str: string, limit: number, ellipses = true) {
+		return LegalAss.call(this, str, limit, ellipses);
 	}
 
 	/**
