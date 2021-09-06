@@ -9,9 +9,7 @@ interface Timer {
 
 export default class Timers {
 	id: string;
-	private timers: {
-		[k: string]: Timer;
-	};
+	private timers: Record<string, Timer>;
 	private log: (label: string, info: string) => void;
 	constructor(log?: ((label: string, info: string) => void) | boolean, id?: string) {
 		this.id = id || crypto.randomBytes(10).toString("hex");

@@ -75,7 +75,7 @@ export default class Time {
 
 		if (!seconds) {
 			if (words) {
-				const e = str.find((v) => v.indexOf("second") !== -1);
+				const e = str.find((v) => v.includes("second"));
 				if (e) {
 					str.splice(str.indexOf(e), 1);
 					if (str.length < 1) str.push("less than 1 minute");
@@ -86,7 +86,7 @@ export default class Time {
 
 		if (!millis) {
 			if (words) {
-				const e = str.find((v) => v.indexOf("millisecond") !== -1);
+				const e = str.find((v) => v.includes("millisecond"));
 				if (e) {
 					str.splice(str.indexOf(e), 1);
 					if (str.length < 1) str.push("less than 1 second");

@@ -94,7 +94,7 @@ export default class Utility {
 			}> = [];
 		for (const v of arr) {
 			let s = (Math.round(((v / total) * 100) * 10) / 10).toString();
-			if (s.indexOf(".") === -1) s = s.padStart(2, "0");
+			if (!s.includes(".")) s = s.padStart(2, "0");
 			else s = s.padStart(4, "0");
 
 			s = s.padEnd(4, ".0");
@@ -227,9 +227,7 @@ export default class Utility {
 	}
 
 	static average<O extends { time: number; type: T; } = never, T extends string = string>(items: Array<O>, sampleSize?: number, type?: T) {
-		const s: {
-			[k: number]: number;
-		} = {};
+		const s: Record<number, number> = {};
 		if (type) items = items.filter((i) => i.type === type);
 
 		for (const v of items) {

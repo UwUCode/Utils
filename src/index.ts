@@ -1,4 +1,5 @@
 import Internal from "./Functions/Internal";
+import LegalAss from "./Functions/LegalAss";
 import Request from "./Functions/Request";
 import Strings from "./Functions/Strings";
 import Time from "./Functions/Time";
@@ -35,6 +36,7 @@ function setValue<K extends keyof List>(key: K, val: List[K]) {
 
 export {
 	Internal,
+	LegalAss,
 	Request,
 	Strings,
 	Time,

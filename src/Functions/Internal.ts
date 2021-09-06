@@ -65,12 +65,10 @@ export default class Internal {
 		// UNIX = df -Pk "/"
 		// WINDOWS = wmic logicaldisk get size,freespace,caption
 
-		const drives: {
-				[k: string]: {
-					total: number;
-					free: number;
-				};
-			} = {},
+		const drives: Record<string, {
+				total: number;
+				free: number;
+			}> = {},
 			unix = process.platform !== "win32",
 			out = execSync(unix ? "df -Pk \"/\"" : "wmic logicaldisk get size,freespace,caption")
 				.toString()
