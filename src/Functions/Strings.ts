@@ -1,3 +1,8 @@
+// eslint-disable-next-line @typescript-eslint/triple-slash-reference
+/// <reference path="../@types/legal-ass.d.ts" />
+
+import LegalAss from "legal-ass";
+
 export default class Strings {
 	private constructor() {
 		throw new TypeError("This class may not be instantiated, use static methods.");
@@ -52,10 +57,28 @@ export default class Strings {
 	 *
 	 * @param {string} str - the string to truncate
 	 * @param {number} limit - the location to truncate at
+	 * @param {boolean} [ellipses] - if ellipses should be included
 	 * @returns {string}
 	 */
 	static truncate(str: string, limit: number, ellipsis = true) {
-		return str.length > limit ? ellipsis === true ? `${str.slice(0 ,limit - 6)} (...)` : str.slice(0, limit) : str;
+		return str.length > limit ? ellipsis === true ? `${str.slice(0, limit - 6)} (...)` : str.slice(0, limit) : str;
+	}
+
+	// I'm using legal-ass just because of the name, this is easy to implement
+	/**
+	 * Limit a string to a maximum length, respecting word boundaries.
+	 *
+	 * @param {string} str - the string to truncate
+	 * @param {number} limit - the location to truncate at
+	 * @param {boolean} [ellipses] - if ellipses should be included
+	 * @returns {string}
+	 */
+	static truncateWords(str: string, limit: number, ellipsis = true) {
+		return LegalAss(str, {
+			length: limit,
+			splitWords: false,
+			ellipses: ellipsis === false ? "" : " (...)"
+		});
 	}
 
 	/**
