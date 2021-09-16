@@ -112,20 +112,24 @@ export default class Strings {
 	 * Parse a provided string into its respective key-value/value flag values
 	 *
 	 * @param {String} str - the string to parse
+	 * @param {(name: string) => boolean} [nameFilter] a function to filter flag names
 	 * @returns {{ normalArgs: string[]; keyValue: Record<string, string>; value: string[]; }}
 	 */
-	static parseFlags(str: string) {
+	static parseFlags(str: string, nameFilter = (name: string) => true) {
 		const parse = stringArgv(str);
 		const normalArgs = [] as Array<string>;
 		const keyValue = {} as Record<string, string>;
 		const value = [] as Array<string>;
 		parse.forEach(v => {
 			if (!v.startsWith("-")) return normalArgs.push(v);
-			else if (!v.includes("=")) return value.push(v.slice(1));
-			else {
+			else if (!v.includes("=")) {
+				if (!nameFilter(v.slice(1))) return normalArgs.push(v);
+				else return value.push(v.slice(1));
+			} else {
 				const parts = v.split("-").filter(Boolean);
 				const nameIndex = parts.findIndex(p => p.includes("="));
 				const [name] = parts.slice(0, nameIndex + 1).join("-").split("=");
+				if (!nameFilter(name)) return normalArgs.push(v);
 				const val = parts.splice(nameIndex).join("-").split("=")[1];
 				if ((val.startsWith("\"") && val.endsWith("\"")) || (val.startsWith("'") && val.endsWith("'"))) keyValue[name] = val.slice(1, -1);
 			}
