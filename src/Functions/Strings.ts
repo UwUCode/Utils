@@ -1,4 +1,5 @@
 import LegalAss from "./LegalAss";
+import stringArgv from "string-argv";
 
 export default class Strings {
 	private constructor() {
@@ -105,5 +106,35 @@ export default class Strings {
 		const last = arr.splice(arr.length - 1, 1)[0];
 		// eslint-disable-next-line @typescript-eslint/restrict-template-expressions
 		return `${arr.join(joiner)}, and ${last}`;
+	}
+
+	/**
+	 * Parse a provided string into its respective key-value/value flag values
+	 *
+	 * @param {String} str - the string to parse
+	 * @returns {{ normalArgs: string[]; keyValue: Record<string, string>; value: string[]; }}
+	 */
+	static parseFlags(str: string) {
+		const parse = stringArgv(str);
+		const normalArgs = [] as Array<string>;
+		const keyValue = {} as Record<string, string>;
+		const value = [] as Array<string>;
+		parse.forEach(v => {
+			if (!v.startsWith("-")) return normalArgs.push(v);
+			else if (!v.includes("=")) return value.push(v.slice(1));
+			else {
+				const parts = v.split("-").filter(Boolean);
+				const nameIndex = parts.findIndex(p => p.includes("="));
+				const [name] = parts.slice(0, nameIndex + 1).join("-").split("=");
+				const val = parts.splice(nameIndex).join("-").split("=")[1];
+				if ((val.startsWith("\"") && val.endsWith("\"")) || (val.startsWith("'") && val.endsWith("'"))) keyValue[name] = val.slice(1, -1);
+			}
+		});
+
+		return {
+			normalArgs,
+			keyValue,
+			value
+		};
 	}
 }
