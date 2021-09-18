@@ -1,5 +1,6 @@
 import LegalAss from "./LegalAss";
 import stringArgv from "string-argv";
+import crypto from "crypto";
 
 export default class Strings {
 	private constructor() {
@@ -115,6 +116,7 @@ export default class Strings {
 	 * @param {(name: string) => boolean} [nameFilter] a function to filter flag names
 	 * @returns {{ normalArgs: string[]; keyValue: Record<string, string>; value: string[]; }}
 	 */
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	static parseFlags(str: string, nameFilter = (name: string) => true) {
 		const parse = stringArgv(str);
 		const normalArgs = [] as Array<string>;
@@ -140,5 +142,36 @@ export default class Strings {
 			keyValue,
 			value
 		};
+	}
+
+	/**
+	 * Make an md5 hash from a string
+	 *
+	 * @param {string} input  - The string to md5
+	 * @returns {string}
+	 */
+	static md5Hash(input: string) {
+		return crypto.createHash("md5").update(input).digest("hex");
+	}
+
+	/**
+	 * Generate a random value
+	 *
+	 * @param {number} len - The length of the output
+	 * @returns {string}
+	 */
+	static randomValue(len: number) {
+		if ((len % 2) !== 0) len = len++;
+		return crypto.randomBytes(len / 2).toString("hex");
+	}
+
+	/**
+	 * Get a random uuid
+	 *
+	 * @param {number} [disableEntropyCache=false] - If the nodejs entropy cache should be disabled
+	 * @returns {string}
+	 */
+	static randomUUID(disableEntropyCache = false) {
+		return crypto.randomUUID({ disableEntropyCache });
 	}
 }
