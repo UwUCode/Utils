@@ -1,6 +1,6 @@
 {
   "name": "@uwu-codes/utils",
-  "version": "1.0.57",
+  "version": "1.0.58",
   
   "description": "General utilities I use.",
   "main": "build/src/index.js",

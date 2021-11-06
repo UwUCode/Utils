@@ -1,5 +1,5 @@
-import { Variables } from "..";
 import { AnyObject } from "@uwu-codes/types";
+import IORedis from "ioredis";
 import * as os from "os";
 
 export default class Utility {
@@ -112,21 +112,22 @@ export default class Utility {
 	 * Because it came to my attention that I should *not* use KEYS in production.
 	 *
 	 * @static
+	 * @param {IORedis.Redis} client - the redis client to use
 	 * @param {string} pattern - The seatch pattern to use.
-	 * @param {(number | string)} cur - Internal use only, provide "0".
-	 * @param {string[]} [keys] - Internal use only, Provide none or null.
-	 * @param {number} [maxPerRun] - The maximum amount of keys to fetch per round.
-	 * @returns {Promise<string[]>}
+	 * @param {string} [cursorStart="0"] - Internal use only.
+	 * @param {Array<string>} [keys=[]] - Internal use only, provide undefined or an empty array.
+	 * @param {number} [maxPerRun=2500] - The maximum amount of keys to fetch per round.
+	 * @returns {Promise<Array<string>>}
 	 * @memberof Utility
-	 * @example Utility.getKeys("some:pattern", "0");
-	 * @example Utility.getKeys("some:pattern", "0", null, 10000);
+	 * @example Utility.getKeys("some:pattern":*);
+	 * @example Utility.getKeys("some:*:pattern", undefined, undefined, 10000);
 	 */
-	static async getKeys(pattern: string, cur = "0", keys = [] as Array<string>, maxPerRun = 10000): Promise<Array<string>> {
-		if (!Variables.REDIS) throw new TypeError("Redis has not been initialized.");
-		const s = await Variables.REDIS.scan(cur, "MATCH", pattern, "COUNT", maxPerRun);
-		keys.push(...s[1]);
-		if (s[0] !== "0") return this.getKeys(pattern, s[0], keys, maxPerRun);
-		else return keys;
+	static async getKeys(client: IORedis.Redis, pattern: string, cursorStart = "0", keys = [] as Array<string>, maxPerRun = 2500): Promise<Array<string>> {
+		const [cursorEnd, k] = await client.scan(cursorStart, "MATCH", pattern, "COUNT", maxPerRun);
+		keys.push(...k);
+		if (cursorEnd !== "0") return this.getKeys(client, pattern, cursorEnd, keys, maxPerRun);
+		// by design duplicate keys can be returned
+		else return this.dedupeArray(keys);
 	}
 
 	/**
@@ -285,5 +286,15 @@ export default class Utility {
 	// eslint-disable-next-line @typescript-eslint/ban-types
 	static isOfType<T extends Function>(obj: unknown, type: T): obj is T {
 		return obj instanceof type;
+	}
+
+	/**
+	 * Remove duplicates from an array
+	 *
+	 * @param {Array<unknown>} arr - the array to remove duplicates from
+	 * @returns
+	 */
+	static dedupeArray<T extends unknown>(arr: Array<T>): Array<T> {
+		return Array.from(new Set(arr));
 	}
 }
