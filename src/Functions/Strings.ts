@@ -174,4 +174,14 @@ export default class Strings {
 	static randomUUID(disableEntropyCache = false) {
 		return crypto.randomUUID({ disableEntropyCache });
 	}
+
+	/**
+	 * Validate a string is a url
+	 *
+	 * @param {string} str - the string to validate
+	 * @returns {boolean}
+	 */
+	static validateURL(str: string) {
+		return /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/.test(str);
+	}
 }
