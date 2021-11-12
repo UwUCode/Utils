@@ -5,6 +5,7 @@ import Strings from "./Functions/Strings";
 import Time from "./Functions/Time";
 import Utility from "./Functions/Utility";
 import Variables from "./Other/Variables";
+import Timer from "./Other/Timer";
 import Timers from "./Other/Timers";
 import Timing from "./Other/Timing";
 import JSON5Helper from "./Other/JSON5Helper";
@@ -39,6 +40,7 @@ export {
 	Utility,
 	setValue,
 	Variables,
+	Timer,
 	Timers,
 	Timing,
 	JSON5Helper,
