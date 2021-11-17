@@ -246,13 +246,11 @@ export default class Time {
 	 */
 	static dateToReadable(d: Date | number | string) {
 		if (!(d instanceof Date)) d = new Date(d);
-		return `${d.getMonth().toString().padStart(2, "0")}/\
-		${(d.getDate() + 1).toString().padStart(2, "0")}/\
-		${d.getFullYear()} \
-		${d.getHours().toString().padStart(2, "0")}:\
-		${d.getMinutes().toString().padStart(2, "0")}:\
-		${d.getSeconds().toString().padStart(2, "0")}`
-		// because the line splits include the tabs/spaces
-			.replace(/(\t|\s{2,4})/g, "");
+		return `${[d.getMonth().toString().padStart(2, "0"),
+			(d.getDate() + 1).toString().padStart(2, "0"),
+			d.getFullYear()].join("/")} ${[
+			d.getHours().toString().padStart(2, "0"),
+			d.getMinutes().toString().padStart(2, "0"),
+			d.getSeconds().toString().padStart(2, "0")].join(":")}`;
 	}
 }
