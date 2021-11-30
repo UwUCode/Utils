@@ -1,6 +1,6 @@
 import ms from "ms";
 import chunk from "chunk";
-import { AnyObject } from "@uwu-codes/types";
+import type { AnyObject } from "@uwu-codes/types";
 
 export interface MsResponse {
 	ms: number;

@@ -1,5 +1,5 @@
-import { AnyObject } from "@uwu-codes/types";
-import IORedis from "ioredis";
+import type { AnyObject } from "@uwu-codes/types";
+import type IORedis from "ioredis";
 import * as os from "os";
 
 export default class Utility {
@@ -132,7 +132,7 @@ export default class Utility {
 
 	/**
 	 * @typedef {object} LogErrorResult
-	 * @prop {Eris.Message<Eris.TextableChannel>} message
+	 * @prop {import("eris").Message<import("eris").TextableChannel>} message
 	 * @prop {string} code
 	 */
 
@@ -291,10 +291,10 @@ export default class Utility {
 	/**
 	 * Remove duplicates from an array
 	 *
-	 * @param {Array<unknown>} arr - the array to remove duplicates from
+	 * @param {Array<any>} arr - the array to remove duplicates from
 	 * @returns
 	 */
-	static dedupeArray<T extends unknown>(arr: Array<T>): Array<T> {
+	static dedupeArray<T>(arr: Array<T>): Array<T> {
 		return Array.from(new Set(arr));
 	}
 }

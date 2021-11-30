@@ -49,7 +49,7 @@ export default class Request {
 			}, (res) => {
 				const data: Array<Buffer> = [];
 				res
-					.on("data", (d) => data.push(d))
+					.on("data", (d: Buffer) => data.push(d))
 					.on("error", (err) => b(err))
 					.on("end", () => a(withHeaders === true ? ({
 						headers: res.headers,

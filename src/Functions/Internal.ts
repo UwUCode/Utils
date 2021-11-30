@@ -1,7 +1,7 @@
 import ts from "typescript";
 import * as fs from "fs-extra";
 import JSON5 from "json5";
-import { AnyFunction } from "@uwu-codes/types";
+import type { AnyFunction } from "@uwu-codes/types";
 import * as os from "os";
 import { execSync } from "child_process";
 

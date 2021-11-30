@@ -1,7 +1,7 @@
 // this code is a modified version of
 // https://github.com/banterability/legal-ass
 
-import { Strings } from "..";
+import type { Strings } from "..";
 export default function LegalAss(this: typeof Strings, str: string, len: number, ellipses = true) {
 	if (len <= 0) throw new Error("Invalid length provided");
 	if (str.length > len) return str;
