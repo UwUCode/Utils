@@ -1,5 +1,4 @@
 import Time from "../Functions/Time";
-import Logger from "logger";
 import crypto from "crypto";
 
 interface Timer {
@@ -14,12 +13,12 @@ export default class Timers {
 	constructor(log?: ((label: string, info: string) => void) | boolean, id?: string) {
 		this.id = id || crypto.randomBytes(10).toString("hex");
 		this.timers = {};
-		this.log = log === true ? (label: string, info: string) => Logger.debug(label, info) : log === false ? () => undefined : log as Timers["log"];
+		this.log = log === true ? (label: string, info: string) => console.debug(label, info) : log === false ? () => undefined : log as Timers["log"];
 	}
 
 	start(label: string) {
 		if (Object.keys(this.timers).includes(label)) throw new TypeError(`Timer with the label "${label}" has already been started.`);
-		// if (this.log) Logger.info(`Timers[${this.id}]`, `Timer with label ${label} started.`);
+		// if (this.log) console.info(`Timers[${this.id}]`, `Timer with label ${label} started.`);
 		const t = this.timers[label] = {
 			start: process.hrtime.bigint(),
 			end: null
