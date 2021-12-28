@@ -188,6 +188,6 @@ export default class Strings {
 	}
 
 	static esm(metaURL: string, ...parts: Array<string>) {
-		return resolve(`${new URL(".", metaURL).pathname}${parts.join("/")}`);
+		return resolve(`${new URL(".", metaURL.startsWith("file://") ? metaURL : `file://${metaURL}`).pathname}${parts.join("/")}`);
 	}
 }
