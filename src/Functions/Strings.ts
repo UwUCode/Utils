@@ -1,6 +1,7 @@
 import LegalAss from "./LegalAss";
 import stringArgv from "string-argv";
 import crypto from "crypto";
+import { URL } from "url";
 
 export default class Strings {
 	private constructor() {
@@ -183,5 +184,9 @@ export default class Strings {
 	 */
 	static validateURL(str: string) {
 		return /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/.test(str);
+	}
+
+	static esmDir(metaURL: string, ...parts: Array<string>) {
+		return `${new URL(".", metaURL).pathname}${parts.join("/")}`;
 	}
 }
