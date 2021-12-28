@@ -1,6 +1,7 @@
 import type { AnyObject } from "@uwu-codes/types";
 import type IORedis from "ioredis";
 import * as os from "os";
+import { URL } from "url";
 
 export default class Utility {
 	private constructor() {
@@ -296,5 +297,9 @@ export default class Utility {
 	 */
 	static dedupeArray<T>(arr: Array<T>): Array<T> {
 		return Array.from(new Set(arr));
+	}
+
+	static esmDir(metaURL: string, ...parts: Array<string>) {
+		return `${new URL(".", metaURL).pathname}${parts.join("/")}`;
 	}
 }
