@@ -1,8 +1,4 @@
 import type { DiskUsage } from "../types";
-import ts from "typescript";
-import * as fs from "fs-extra";
-import JSON5 from "json5";
-import type { AnyFunction } from "@uwu-codes/types";
 import * as os from "os";
 import { exec } from "child_process";
 
@@ -89,54 +85,5 @@ export default class Internal {
 			drives,
 			unix
 		};
-	}
-
-	/**
-	 * Get our tsconfig file in a json format.
-	 *
-	 * @static
-	 * @param {(string | null)} [file] - A file to read from.
-	 * @returns {ts.TranspileOptions}
-	 * @memberof Internal
-	 * @example Internal.getTSConfig();
-	 * @example Internal.getTSConfig("/opt/NPMBot/tsconfig.json");
-	 */
-	static getTSConfig(file: string) {
-		const c = (JSON5.parse as AnyFunction<[file: string], ts.TranspileOptions>)(fs.readFileSync(file).toString());
-		return {
-			...c,
-			compilerOptions: {
-				...c.compilerOptions,
-				target:           ts.ScriptTarget.ESNext,
-				moduleResolution: ts.ModuleResolutionKind.NodeJs,
-				module:           ts.ModuleKind.CommonJS,
-				lib:              [
-					"lib.es2015.d.ts",
-					"lib.es2016.d.ts",
-					"lib.es2017.d.ts",
-					"lib.es2018.d.ts",
-					"lib.es2019.d.ts",
-					"lib.es2020.d.ts",
-					"lib.esnext.d.ts"
-				]
-			}
-		} as ts.TranspileOptions;
-	}
-
-	/**
-	 * Transpile a single file, returning the transpiled contents.
-	 *
-	 * @static
-	 * @param {string} mod - The code to transpile
-	 * @param {(ts.TranspileOptions | string)} [tsconfig] - the tsconfig to use
-	 * @returns {string}
-	 * @memberof Internal
-	 * @example Internal.transpile(fs.readFileSync("/opt/NPMBot/index.ts"));
-	 * @example Internal.transpile(fs.readFileSync("/opt/NPMBot/index.ts"), "/opt/NPMBot/tsconfig.json");
-	 */
-	static transpile(mod: string, tsconfig: ts.TranspileOptions | string) {
-		const cnf = typeof tsconfig === "string" ? this.getTSConfig(tsconfig) : tsconfig;
-
-		return ts.transpileModule(mod, cnf).outputText;
 	}
 }
