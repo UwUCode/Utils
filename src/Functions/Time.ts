@@ -1,7 +1,6 @@
-import type { MsResponse } from "../types";
+import type { MsOptions, MsResponse as RawMS } from "../types";
 import ms from "ms";
 import chunk from "chunk";
-import type { AnyObject } from "@uwu-codes/types";
 
 
 export default class Time {
@@ -17,19 +16,25 @@ export default class Time {
 	 * @param {boolean} [words=false] - If we should return full words or just letters.
 	 * @param {boolean} [seconds=true] - If we should return seconds.
 	 * @param {boolean} [millis=false] - If we should return milliseconds.
-	 * @returns {(Promise<string | MsResponse>)}
+	 * @returns {(Promise<string | RawMS>)}
 	 * @memberof Time
 	 * @example ms(120000);
 	 * @example ms(240000, true);
 	 */
-	static ms(time: number, words?: boolean, seconds?: boolean, millis?: boolean, obj?: false): string;
-	static ms(time: number, words: boolean, seconds: boolean, millis: boolean, obj: true): MsResponse;
-	static ms(time: number, words = false, seconds = true, millis = false, obj = false) {
-		if (time < 0) throw new TypeError("Negative time provided.");
-		if (time === 0) return words ? "0 seconds" : "0s";
-		const r = {
+	static ms<R extends boolean = false>(time: number, options?: MsOptions<R>): R extends false ? string : RawMS;
+	static ms<R extends boolean = false>(time: number, options: MsOptions<R> = {}): string | RawMS {
+		options = options ?? {};
+		options = Object.assign(options, {
+			words:     false,
+			seconds:   true,
+			ms:        false,
+			shortMS:   true,
+			raw:       false,
+			monthAbbr: "mn"
+		});
+		const r: RawMS = {
 			// Number.EPSILON = https://stackoverflow.com/a/11832950
-			milliseconds: Math.round(((time % 1000) + Number.EPSILON) * 100) / 100,
+			milliseconds: 0,
 			seconds:      0,
 			minutes:      0,
 			hours:        0,
@@ -37,6 +42,13 @@ export default class Time {
 			months:       0,
 			years:        0
 		};
+		if (time < 0) throw new TypeError("Negative time provided.");
+		if (time === 0) {
+			if (options.raw) return r;
+			else return options.words ? "0 seconds" : "0s";
+		}
+		// Number.EPSILON = https://stackoverflow.com/a/11832950
+		r.milliseconds = Math.round(((time % 1000) + Number.EPSILON) * 100) / 100;
 		r.years = Math.floor(time / 3.154e+10);
 		time -= r.years * 3.154e+10;
 		r.months = Math.floor(time / 2.628e+9);
@@ -50,44 +62,25 @@ export default class Time {
 		r.seconds = Math.floor(time / 1e3);
 		time -= r.seconds * 1e3;
 
-		if (obj) return r;
+		const total = (Object.values(r) as Array<number>).reduce((a, b) => a + b, 0);
+		if (options.raw) return r;
+		else {
+			if (!options.ms && r.milliseconds === total) return options.words ? "less than one second" : "none";
+			if (!options.seconds && r.seconds === total) return options.words ? "less than one minute" : "none";
+		}
 
 		const str: Array<string> = [];
-		if (r.milliseconds > 0) str.push(`${r.milliseconds} millisecond${r.milliseconds === 1 ? "" : "s"}`);
-		if (r.seconds > 0) str.push(`${r.seconds} second${r.seconds === 1 ? "" : "s"}`);
-		if (r.minutes > 0) str.push(`${r.minutes} minute${r.minutes === 1 ? "" : "s"}`);
-		if (r.hours > 0) str.push(`${r.hours} hour${r.hours === 1 ? "" : "s"}`);
-		if (r.days > 0) str.push(`${r.days} day${r.days === 1 ? "" : "s"}`);
-		if (r.months > 0) str.push(`${r.months} month${r.months === 1 ? "" : "s"}`);
-		if (r.years > 0) str.push(`${r.years} year${r.years === 1 ? "" : "s"}`);
+		if (r.milliseconds > 0 && options.ms) str.push(`${r.milliseconds} ${options.words ? `millisecond${r.milliseconds === 1 ? "" : "s"}` : "ms"}`);
+		if (r.seconds > 0 && options.seconds) str.push(`${r.seconds} ${options.words ? `second${r.seconds === 1 ? "" : "s"}` : "s"}`);
+		if (r.minutes > 0) str.push(`${r.minutes} ${options.words ? `minute${r.minutes === 1 ? "" : "s"}` : "m"}`);
+		if (r.hours > 0) str.push(`${r.hours} ${options.words ? `hour${r.hours === 1 ? "" : "s"}` : "h"}`);
+		if (r.days > 0) str.push(`${r.days} ${options.words ? `day${r.days === 1 ? "" : "s"}` : "d"}`);
+		if (r.months > 0) str.push(`${r.months} ${options.words ? `month${r.months === 1 ? "" : "s"}` : options.monthAbbr!}`);
+		if (r.years > 0) str.push(`${r.years} ${options.words ? `year${r.years === 1 ? "" : "s"}` : "y"}`);
 
-		if (words && str.length > 1) str[0] = `and ${str[0]}`;
+		if (options.words && str.length > 1) str[0] = `and ${str[0]}`;
 
-		if (!seconds) {
-			if (words) {
-				const e = str.find((v) => v.includes("second"));
-				if (e) {
-					str.splice(str.indexOf(e), 1);
-					if (str.length < 1) str.push("less than 1 minute");
-				}
-			} else delete (r as AnyObject<number>).s;
-		}
-
-
-		if (!millis) {
-			if (words) {
-				const e = str.find((v) => v.includes("millisecond"));
-				if (e) {
-					str.splice(str.indexOf(e), 1);
-					if (str.length < 1) str.push("less than 1 second");
-				}
-			} else {
-				delete (r as AnyObject<number>).ms;
-			}
-		}
-
-
-		return words ? str.reverse().join(", ") : Object.keys(r).filter((k) => (r as AnyObject<number>)[k] > 0).map((k) => `${Math.floor((r as AnyObject<number>)[k])}${k}`).reverse().reduce((a, b) => a + b, "");
+		return  str.join(options.words ? "," : "");
 	}
 
 	/**
@@ -100,11 +93,10 @@ export default class Time {
 	static convert(input: number, type: "ms" | "mi" | "ns", dec = 3): string {
 		input = parseFloat(input.toFixed(dec));
 		switch (type) {
-			case "ms": return input < 1000 ? `${input}ms` : this.ms(input, true, true, true);
+			case "ms": return input < 1000 ? `${input}ms` : this.ms(input, { words: true, seconds: true, ms: true });
 			case "mi": return input < 1000 ? `${input}µs` : this.convert(input / 1000, "ms", dec);
 			case "ns": return input < 1000 ? `${input}ns` : this.convert(input / 1000, "mi", dec);
-			// eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-			default: return `${input}${type}`;
+			default: return `${input}${type as string}`;
 		}
 	}
 
@@ -123,7 +115,7 @@ export default class Time {
 	static formatAgo(t: number | Date, sub?: boolean, seconds?: boolean, firstOnly?: boolean) {
 		if (t instanceof Date) t = t.getTime();
 		if (sub) t = Date.now() - t;
-		const v = Time.ms(t, true, seconds);
+		const v = Time.ms(t, { words: true, seconds });
 		return `${firstOnly ? v.split(",")[0] : v} ago`;
 	}
 
@@ -136,12 +128,13 @@ export default class Time {
 	 * @param {boolean} [millis=false] - If milliseconds should be returned.
 	 * @returns {string}
 	 * @memberof Time
-	 * @example Time.formatDateWithPadding();
-	 * @example Time.formatDateWithPadding(new Date());
-	 * @example Time.formatDateWithPadding(new Date(), true);
-	 * @example Time.formatDateWithPadding(new Date(), true, true);
+	 * @example formatDateWithPadding();
+	 * @example formatDateWithPadding(new Date());
+	 * @example formatDateWithPadding(new Date(), true);
+	 * @example formatDateWithPadding(new Date(), true, true);
 	 */
-	static formatDateWithPadding(d: Date | number = new Date(), hms = true, millis = false, words = false, useLang = false) {
+	// @TODO convert options to object
+	static formatDateWithPadding(d: Date | number = new Date(), hms = true, millis = false, words = false) {
 		if (typeof d === "number") d = new Date(d);
 		const months = [
 				"January", "February", "March", "April",
@@ -154,8 +147,24 @@ export default class Time {
 				"Saturday"
 			],
 			h = d.getHours() % 12;
-		if (words) return `${useLang ? `{lang:other.dayOfWeek.${d.getDay()}}` : days[d.getDay()]} ${useLang ? `{lang:other.months.${d.getMonth()}}` : months[d.getMonth()]} ${(d.getDate()).toString().padStart(2, "0")}, ${d.getFullYear()} ${h  === 0 ? 12 : h} ${useLang ? `{lang:other.words.${d.getHours() < 12 ? "am" : "pm"}$upper$}` : d.getHours() < 12 ? "AM" : "PM"}`;
+		if (words) return `${days[d.getDay()]} ${months[d.getMonth()]} ${(d.getDate()).toString().padStart(2, "0")}, ${d.getFullYear()} ${h  === 0 ? 12 : h.toString().padStart(2, "0")}:${d.toString().padStart(2, "0")}:${d.getSeconds().toString().padStart(2, "0")} ${d.getHours() < 12 ? "AM" : "PM"}`;
 		else return `${(d.getMonth() + 1).toString().padStart(2, "0")}/${(d.getDate()).toString().padStart(2, "0")}/${d.getFullYear()}${hms ? ` ${(h  === 0 ? 12 : h).toString().padStart(2, "0")}:${(d.getMinutes()).toString().padStart(2, "0")}:${(d.getSeconds()).toString().padStart(2, "0")}` : ""}${millis ? `.${(d.getMilliseconds()).toString().padStart(3, "0")}` : ""}`;
+	}
+
+	/**
+	 * Convert a date object into DD/MM/YYYY HH:MM:SS
+	 *
+	 * @param {(Date | number | string)} d - The object to convert
+	 * @returns {string}
+	 */
+	static dateToReadable(d: Date | number | string) {
+		if (!(d instanceof Date)) d = new Date(d);
+		return `${[d.getMonth().toString().padStart(2, "0"),
+			(d.getDate() + 1).toString().padStart(2, "0"),
+			d.getFullYear()].join("/")} ${[
+			d.getHours().toString().padStart(2, "0"),
+			d.getMinutes().toString().padStart(2, "0"),
+			d.getSeconds().toString().padStart(2, "0")].join(":")}`;
 	}
 
 	/**
@@ -168,19 +177,17 @@ export default class Time {
 	 * @example Time.secondsToHMS(1800);
 	 */
 	static secondsToHMS(sec: number) {
-		let hours: string | number = Math.floor(sec / 3600),
-			minutes: string | number = Math.floor((sec - (hours * 3600)) / 60),
-			seconds: string | number = Math.floor(sec - (hours * 3600) - (minutes * 60));
+		const hours: number = Math.floor(sec / 3600),
+			minutes: number = Math.floor((sec - (hours * 3600)) / 60),
+			seconds: number = Math.floor(sec - (hours * 3600) - (minutes * 60));
 
-		if (hours < 10) hours = `0${hours}`;
-		if (minutes < 10) minutes = `0${minutes}`;
-		if (seconds < 10) seconds = `0${seconds}`;
-		return `${hours}:${minutes}:${seconds}`;
+		return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
 	}
 
 	/**
 	 * Parse a string into milliseconds
 	 *
+	 * @deprecated candidate for removal
 	 * @param {string} str - the string to parse
 	 * @returns {number}
 	 */
@@ -195,6 +202,7 @@ export default class Time {
 	/**
 	 * Parse time, but with proper word support (experimental!)
 	 *
+	 * @deprecated candidate for removal
 	 * @param {string} str - The string to parse
 	 * @returns {number}
 	 */
@@ -226,21 +234,5 @@ export default class Time {
 	 */
 	static getDaysInMonth(month: number) {
 		return new Date(new Date().getFullYear(), month, 0).getDate();
-	}
-
-	/**
-	 * Convert a date object into DD/MM/YYYY HH:MM:SS
-	 *
-	 * @param {(Date | number | string)} d - The object to convert
-	 * @returns {string}
-	 */
-	static dateToReadable(d: Date | number | string) {
-		if (!(d instanceof Date)) d = new Date(d);
-		return `${[d.getMonth().toString().padStart(2, "0"),
-			(d.getDate() + 1).toString().padStart(2, "0"),
-			d.getFullYear()].join("/")} ${[
-			d.getHours().toString().padStart(2, "0"),
-			d.getMinutes().toString().padStart(2, "0"),
-			d.getSeconds().toString().padStart(2, "0")].join(":")}`;
 	}
 }

@@ -17,3 +17,12 @@ export interface MsResponse {
 	months: number;
 	years: number;
 }
+
+export interface MsOptions<R extends boolean = boolean> {
+	words?: boolean;
+	seconds?: boolean;
+	ms?: boolean;
+	shortMS?: boolean;
+	monthAbbr?: string;
+	raw?: R;
+}
