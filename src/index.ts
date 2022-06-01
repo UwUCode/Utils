@@ -7,7 +7,6 @@ import Variables from "./Other/Variables";
 import Timer from "./Other/Timer";
 import Timers from "./Other/Timers";
 import Timing from "./Other/Timing";
-import JSON5Helper from "./Other/JSON5Helper";
 import SessionStore from "./Other/SessionStore";
 import ReNice from "./Other/ReNice";
 import pid from "./Other/pid";
@@ -41,7 +40,6 @@ export {
 	Timer,
 	Timers,
 	Timing,
-	JSON5Helper,
 	SessionStore,
 	ReNice,
 	pid
