@@ -6,6 +6,7 @@ interface Timer {
 	end: bigint | null;
 }
 
+/** @deprecated candidate for removal */
 export default class Timers {
 	id: string;
 	private timers: Record<string, Timer>;
@@ -21,7 +22,7 @@ export default class Timers {
 		// if (this.log) console.info(`Timers[${this.id}]`, `Timer with label ${label} started.`);
 		const t = this.timers[label] = {
 			start: process.hrtime.bigint(),
-			end: null
+			end:   null
 		};
 		return t.start;
 	}

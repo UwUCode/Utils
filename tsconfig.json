@@ -1,20 +1,11 @@
 {
-    "extends": "@uwu-codes/tsconfig",
-    "compilerOptions": {
-        "outDir": "./build",
-        "baseUrl": "./src",
-        "declaration": true,
-        "inlineSourceMap": false
-    },
-    "include": [
-        "src/**/*"
-    ],
-    "exclude": [
-        "node_modules",
-        "build",
-        "out",
-        "tmp",
-        "logs",
-        "test"
-    ]
+  "extends": "@uwu-codes/tsconfig",
+  "compilerOptions": {
+    "outDir": "./build",
+    "baseUrl": "./src",
+    "declaration": true,
+    "inlineSourceMap": false
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "build"]
 }

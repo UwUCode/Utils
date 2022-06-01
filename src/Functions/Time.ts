@@ -1,16 +1,7 @@
+import type { MsResponse } from "../types";
 import ms from "ms";
 import chunk from "chunk";
 import type { AnyObject } from "@uwu-codes/types";
-
-export interface MsResponse {
-	ms: number;
-	s: number;
-	m: number;
-	h: number;
-	d: number;
-	mn: number;
-	y: number;
-}
 
 
 export default class Time {
@@ -28,48 +19,47 @@ export default class Time {
 	 * @param {boolean} [millis=false] - If we should return milliseconds.
 	 * @returns {(Promise<string | MsResponse>)}
 	 * @memberof Time
-	 * @example Time.ms(120000);
-	 * @example Time.ms(240000, true);
+	 * @example ms(120000);
+	 * @example ms(240000, true);
 	 */
 	static ms(time: number, words?: boolean, seconds?: boolean, millis?: boolean, obj?: false): string;
 	static ms(time: number, words: boolean, seconds: boolean, millis: boolean, obj: true): MsResponse;
 	static ms(time: number, words = false, seconds = true, millis = false, obj = false) {
 		if (time < 0) throw new TypeError("Negative time provided.");
-		// @FIXME language :sweats:
 		if (time === 0) return words ? "0 seconds" : "0s";
 		const r = {
 			// Number.EPSILON = https://stackoverflow.com/a/11832950
-			ms: Math.round(((time % 1000) + Number.EPSILON) * 100) / 100,
-			s: 0,
-			m: 0,
-			h: 0,
-			d: 0,
-			mn: 0,
-			y: 0
+			milliseconds: Math.round(((time % 1000) + Number.EPSILON) * 100) / 100,
+			seconds:      0,
+			minutes:      0,
+			hours:        0,
+			days:         0,
+			months:       0,
+			years:        0
 		};
-		r.y = Math.floor(time / 3.154e+10);
-		time -= r.y * 3.154e+10;
-		r.mn = Math.floor(time / 2.628e+9);
-		time -= r.mn * 2.628e+9;
-		r.d = Math.floor(time / 8.64e+7);
-		time -= r.d * 8.64e+7;
-		r.h = Math.floor(time / 3.6e+6);
-		time -= r.h * 3.6e+6;
-		r.m = Math.floor(time / 6e4);
-		time -= r.m * 6e4;
-		r.s = Math.floor(time / 1e3);
-		time -= r.s * 1e3;
+		r.years = Math.floor(time / 3.154e+10);
+		time -= r.years * 3.154e+10;
+		r.months = Math.floor(time / 2.628e+9);
+		time -= r.months * 2.628e+9;
+		r.days = Math.floor(time / 8.64e+7);
+		time -= r.days * 8.64e+7;
+		r.hours = Math.floor(time / 3.6e+6);
+		time -= r.hours * 3.6e+6;
+		r.minutes = Math.floor(time / 6e4);
+		time -= r.minutes * 6e4;
+		r.seconds = Math.floor(time / 1e3);
+		time -= r.seconds * 1e3;
 
 		if (obj) return r;
 
 		const str: Array<string> = [];
-		if (r.ms > 0 && ms) str.push(`${r.ms} millisecond${r.ms === 1 ? "" : "s"}`);
-		if (r.s > 0) str.push(`${r.s} second${r.s === 1 ? "" : "s"}`);
-		if (r.m > 0) str.push(`${r.m} minute${r.m === 1 ? "" : "s"}`);
-		if (r.h > 0) str.push(`${r.h} hour${r.h === 1 ? "" : "s"}`);
-		if (r.d > 0) str.push(`${r.d} day${r.d === 1 ? "" : "s"}`);
-		if (r.mn > 0) str.push(`${r.mn} month${r.mn === 1 ? "" : "s"}`);
-		if (r.y > 0) str.push(`${r.y} year${r.y === 1 ? "" : "s"}`);
+		if (r.milliseconds > 0) str.push(`${r.milliseconds} millisecond${r.milliseconds === 1 ? "" : "s"}`);
+		if (r.seconds > 0) str.push(`${r.seconds} second${r.seconds === 1 ? "" : "s"}`);
+		if (r.minutes > 0) str.push(`${r.minutes} minute${r.minutes === 1 ? "" : "s"}`);
+		if (r.hours > 0) str.push(`${r.hours} hour${r.hours === 1 ? "" : "s"}`);
+		if (r.days > 0) str.push(`${r.days} day${r.days === 1 ? "" : "s"}`);
+		if (r.months > 0) str.push(`${r.months} month${r.months === 1 ? "" : "s"}`);
+		if (r.years > 0) str.push(`${r.years} year${r.years === 1 ? "" : "s"}`);
 
 		if (words && str.length > 1) str[0] = `and ${str[0]}`;
 

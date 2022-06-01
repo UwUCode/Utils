@@ -1,12 +1,13 @@
-import * as fs from "fs-extra";
+import { existsSync, mkdirSync, rmSync, writeFileSync } from "fs";
 import { dirname } from "path";
 export default function pid(path: string) {
 	const b = dirname(path);
-	if (!fs.existsSync(b)) fs.mkdirpSync(b);
-	fs.writeFileSync(path, process.pid.toString());
+	if (!existsSync(b)) mkdirSync(b, { recursive: true });
+	writeFileSync(path, process.pid.toString());
+	// some handlers do not support async code,
 	function remove(type: string | null) {
 		try {
-			fs.unlinkSync(path);
+			rmSync(path, { force: true });
 		} catch (e) {
 			// not handling this error
 		}

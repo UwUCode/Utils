@@ -1,7 +1,9 @@
 import type { AnyObject } from "@uwu-codes/types";
-import type IORedis from "ioredis";
+import type Redis from "ioredis";
+import { assert, is } from "tsafe";
 import * as os from "os";
 
+let warningEmitted = false;
 export default class Utility {
 	private constructor() {
 		throw new TypeError("This class may not be instantiated, use static methods.");
@@ -99,7 +101,7 @@ export default class Utility {
 
 			s = s.padEnd(4, ".0");
 			a.push({
-				input: v,
+				input:   v,
 				percent: s
 			});
 		}
@@ -112,29 +114,23 @@ export default class Utility {
 	 * Because it came to my attention that I should *not* use KEYS in production.
 	 *
 	 * @static
-	 * @param {IORedis.Redis} client - the redis client to use
+	 * @param {Redis} client - the redis client to use
 	 * @param {string} pattern - The seatch pattern to use.
 	 * @param {string} [cursorStart="0"] - Internal use only.
 	 * @param {Array<string>} [keys=[]] - Internal use only, provide undefined or an empty array.
 	 * @param {number} [maxPerRun=2500] - The maximum amount of keys to fetch per round.
 	 * @returns {Promise<Array<string>>}
 	 * @memberof Utility
-	 * @example Utility.getKeys("some:pattern":*);
-	 * @example Utility.getKeys("some:*:pattern", undefined, undefined, 10000);
+	 * @example getKeys("some:pattern":*);
+	 * @example getKeys("some:*:pattern", undefined, undefined, 10000);
 	 */
-	static async getKeys(client: IORedis.Redis, pattern: string, cursorStart = "0", keys = [] as Array<string>, maxPerRun = 2500): Promise<Array<string>> {
+	static async getKeys(client: Redis, pattern: string, cursorStart = "0", keys = [] as Array<string>, maxPerRun = 2500): Promise<Array<string>> {
 		const [cursorEnd, k] = await client.scan(cursorStart, "MATCH", pattern, "COUNT", maxPerRun);
 		keys.push(...k);
 		if (cursorEnd !== "0") return this.getKeys(client, pattern, cursorEnd, keys, maxPerRun);
 		// by design duplicate keys can be returned
-		else return this.dedupeArray(keys);
+		else return Array.from(new Set(keys));
 	}
-
-	/**
-	 * @typedef {object} LogErrorResult
-	 * @prop {import("eris").Message<import("eris").TextableChannel>} message
-	 * @prop {string} code
-	 */
 
 	/**
 	 * @typedef {object} CPUInfo
@@ -165,7 +161,7 @@ export default class Utility {
 		return {
 			idle,
 			total,
-			idleAverage: (idle / c.length),
+			idleAverage:  (idle / c.length),
 			totalAverage: (total / c.length)
 		};
 	}
@@ -176,7 +172,7 @@ export default class Utility {
 	 * @static
 	 * @returns {number}
 	 * @memberof Utility
-	 * @example Utility.getCPUUsage();
+	 * @example getCPUUsage();
 	 */
 	static async getCPUUsage() {
 		const { idleAverage: i1, totalAverage: t1 } = this.getCPUInfo();
@@ -187,21 +183,42 @@ export default class Utility {
 		return (10000 - Math.round(10000 * (i2 - i1) / (t2 - t1))) / 100;
 	}
 
-	static chooseWeighted<K extends string = string>(values: {
-		[k in K]: number;
-	}) {
-		const items = Object.keys(values);
-		let chances: Array<number> = Object.values(values);
-		const sum = chances.reduce((a, b) => a + b, 0);
+	/**
+	 * chose a value with the provided bias
+	 *
+	 * @static
+	 * @template K
+	 * @param {Array<string>} values - the values to pick from
+	 * @param {Array<number>} weights - the weight of the values
+	 * @returns {K}
+	 * @memberof Utility
+	 * @example chooseWeighted([1,2,3,4], [60, 10, 25, 5])
+	 */
+	static chooseWeighted<K extends symbol | string | number = symbol | string | number>(values: Array<K>, weights: Array<number>): K;
+	/** @deprecated candidate for removal */
+	static chooseWeighted<K extends symbol | string | number = symbol | string | number>(values: Record<K, number>): K;
+	static chooseWeighted<K extends symbol | string | number = symbol | string | number>(values: Record<K, number> | Array<K>, weights?: Array<number>) {
+		if (typeof values === "object" && values.constructor.name === "Object") {
+			if (!warningEmitted) {
+				process.emitWarning("Utility#chooseWeighted called with deprecated key-value pair");
+				warningEmitted = true;
+			}
+			weights = Object.values(values as Record<K, number>);
+			values = Object.keys(values) as Array<K>;
+		}
+		assert(is<Array<string>>(values));
+		assert(is<Array<K>>(weights));
+		const sum = weights.reduce((a, b) => a + b, 0);
 		let b = 0;
-		chances = chances.map((a) => (b = a + b));
+		weights = weights.map((a) => (b = a + b));
 		const rand = Math.random() * sum;
-		return items[chances.filter((el) => el <= rand).length] as K;
+		return values[weights.filter((el) => el <= rand).length] as K;
 	}
 
 	/**
 	 * Merge two objects into one
 	 *
+	 * @deprecated candidate for removal
 	 * @param {A} a - The object to merge properties on to
 	 * @param {B} b - The object to merge properties from
 	 * @template A
@@ -225,76 +242,5 @@ export default class Utility {
 		}
 
 		return obj;
-	}
-
-	static average<O extends { time: number; type: T; } = never, T extends string = string>(items: Array<O>, sampleSize?: number, type?: T) {
-		const s: Record<number, number> = {};
-		if (type) items = items.filter((i) => i.type === type);
-
-		for (const v of items) {
-			const sec = Number(Math.floor(v.time / 1000).toString().slice(-1));
-			if (!s[sec]) s[sec] = 0;
-			s[sec]++;
-		}
-
-		const sample = Object.values(s).slice(0, sampleSize);
-
-		return {
-			avg: Math.floor(sample.reduce((a, b) => a + b, 0) / sample.length) || 0,
-			sample
-		};
-	}
-
-	static roundExponent(exp: number, num: number) {
-		return Math.pow(exp, Math.round(Math.log(num) / Math.log(exp)));
-	}
-
-	static calcHeightSlice(slices: number, height: number) {
-		const res: Array<number> = [];
-		for (let i = 1; i <= slices; i++) for (let ii = 1; ii <= slices; ii++) res.push((height / slices) * i);
-		return res;
-	}
-
-	static calcWidthSlice(slices: number, width: number) {
-		const res: Array<number> = [];
-		for (let i = 1; i <= slices; i++) for (let ii = 1; ii <= slices; ii++) res.push((width / slices) * ii);
-		return res;
-	}
-
-	static calcSlices(slicesH: number, slicesW: number, height: number, width: number): [height: Array<number>, width: Array<number>] {
-		return [this.calcHeightSlice(slicesH, height), this.calcWidthSlice(slicesW, width)];
-	}
-
-	static calcSlicesSame(slices: number, height: number, width: number) {
-		return this.calcSlices(slices, slices, height, width);
-	}
-
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	static definePropertyIfNotPresent<T>(obj: T, prop: PropertyKey, attr: PropertyDescriptor & ThisType<any>): boolean {
-		if (prop in obj) return false;
-		Object.defineProperty(obj, prop, attr);
-		return true;
-	}
-
-	/**
-	 * Check if the provided object is of the type
-	 *
-	 * @param {object} obj - the object to test
-	 * @param {Function} type - the type to test against
-	 * @returns
-	 */
-	// eslint-disable-next-line @typescript-eslint/ban-types
-	static isOfType<T extends Function>(obj: unknown, type: T): obj is T {
-		return obj instanceof type;
-	}
-
-	/**
-	 * Remove duplicates from an array
-	 *
-	 * @param {Array<any>} arr - the array to remove duplicates from
-	 * @returns
-	 */
-	static dedupeArray<T>(arr: Array<T>): Array<T> {
-		return Array.from(new Set(arr));
 	}
 }

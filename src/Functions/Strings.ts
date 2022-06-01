@@ -1,5 +1,4 @@
 import LegalAss from "./LegalAss";
-import stringArgv from "string-argv";
 import crypto from "crypto";
 import { URL } from "url";
 import { resolve } from "path";
@@ -20,13 +19,6 @@ export default class Strings {
 	 */
 	static ucwords(str: string) {
 		return str.toString().toLowerCase().replace(/^(.)|\s+(.)/g, (r) => r.toUpperCase());
-	}
-
-	static formatString(str: string, formatArgs: Array<string | number>) {
-		formatArgs.map((a, i) => {
-			str = str?.replace(new RegExp(`\\{${i}\\}`, "g"), a?.toString());
-		});
-		return str;
 	}
 
 	/**
@@ -107,48 +99,13 @@ export default class Strings {
 	static joinAnd(arr: Array<unknown>, joiner = ", ") {
 		if (arr.length === 1) return String(arr[0]);
 		const last = arr.splice(arr.length - 1, 1)[0];
-		// eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-		return `${arr.join(joiner)}, and ${last}`;
-	}
-
-	/**
-	 * Parse a provided string into its respective key-value/value flag values
-	 *
-	 * @param {String} str - the string to parse
-	 * @param {(name: string) => boolean} [nameFilter] a function to filter flag names
-	 * @returns {{ normalArgs: string[]; keyValue: Record<string, string>; value: string[]; }}
-	 */
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	static parseFlags(str: string, nameFilter = (name: string) => true) {
-		const parse = stringArgv(str);
-		const normalArgs = [] as Array<string>;
-		const keyValue = {} as Record<string, string>;
-		const value = [] as Array<string>;
-		parse.forEach(v => {
-			if (!v.startsWith("-")) return normalArgs.push(v);
-			else if (!v.includes("=")) {
-				if (!nameFilter(v.slice(1))) return normalArgs.push(v);
-				else return value.push(v.slice(1));
-			} else {
-				const parts = v.split("-").filter(Boolean);
-				const nameIndex = parts.findIndex(p => p.includes("="));
-				const [name] = parts.slice(0, nameIndex + 1).join("-").split("=");
-				if (!nameFilter(name)) return normalArgs.push(v);
-				const val = parts.splice(nameIndex).join("-").split("=")[1];
-				if ((val.startsWith("\"") && val.endsWith("\"")) || (val.startsWith("'") && val.endsWith("'"))) keyValue[name] = val.slice(1, -1);
-			}
-		});
-
-		return {
-			normalArgs,
-			keyValue,
-			value
-		};
+		return `${arr.join(joiner)}, and ${last as string}`;
 	}
 
 	/**
 	 * Make an md5 hash from a string
 	 *
+	 * @deprecated candidate for removal
 	 * @param {string} input  - The string to md5
 	 * @returns {string}
 	 */
@@ -159,6 +116,7 @@ export default class Strings {
 	/**
 	 * Generate a random value
 	 *
+	 * @deprecated candidate for removal
 	 * @param {number} len - The length of the output
 	 * @returns {string}
 	 */
@@ -170,6 +128,7 @@ export default class Strings {
 	/**
 	 * Get a random uuid
 	 *
+	 * @deprecated candidate for removal
 	 * @param {number} [disableEntropyCache=false] - If the nodejs entropy cache should be disabled
 	 * @returns {string}
 	 */
@@ -187,7 +146,19 @@ export default class Strings {
 		return /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/.test(str);
 	}
 
-	static esm(metaURL: string, ...parts: Array<string>) {
+	/**
+	 * join strings together as an esm url
+	 *
+	 * @deprecated candidate for removal
+	 * @param {(URL | string)} metaURL - import.meta.url
+	 * @param {...Array<string>} parts - the parts to join
+	 * @returns
+	 */
+	static joinESM(metaURL: URL | string, ...parts: Array<string>) {
+		if (metaURL instanceof URL) metaURL = metaURL.pathname;
 		return resolve(`${new URL(".", metaURL.startsWith("file://") ? metaURL : `file://${metaURL}`).pathname}${parts.join("/")}`);
 	}
+
+	/** @deprecated candidate for removal */
+	static get esm() { return this.joinESM.bind(this); }
 }
