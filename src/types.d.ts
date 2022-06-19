@@ -18,6 +18,16 @@ export interface MsResponse {
 	years: number;
 }
 
+export interface MsBigInt {
+	milliseconds: bigint;
+	seconds: bigint;
+	minutes: bigint;
+	hours: bigint;
+	days: bigint;
+	months: bigint;
+	years: bigint;
+}
+
 export interface MsOptions<R extends boolean = boolean> {
 	words?: boolean;
 	seconds?: boolean;

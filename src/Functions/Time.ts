@@ -1,4 +1,4 @@
-import type { MsOptions, MsResponse as RawMS } from "../types";
+import type { MsOptions, MsResponse as RawMS, MsBigInt as RawMSBigInt, MsResponse } from "../types";
 import ms from "ms";
 import chunk from "chunk";
 
@@ -12,7 +12,7 @@ export default class Time {
 	 * Convert milliseconds into readable time.
 	 *
 	 * @static
-	 * @param {number} time - The time to convert.
+	 * @param {(Number | BigInt)} time - The time to convert.
 	 * @param {boolean} [words=false] - If we should return full words or just letters.
 	 * @param {boolean} [seconds=true] - If we should return seconds.
 	 * @param {boolean} [millis=false] - If we should return milliseconds.
@@ -21,66 +21,68 @@ export default class Time {
 	 * @example ms(120000);
 	 * @example ms(240000, true);
 	 */
-	static ms<R extends boolean = false>(time: number, options?: MsOptions<R>): R extends false ? string : RawMS;
-	static ms<R extends boolean = false>(time: number, options: MsOptions<R> = {}): string | RawMS {
+	static ms<R extends boolean = false>(time: number | bigint, options?: MsOptions<R>): R extends false ? string : RawMS;
+	static ms<R extends boolean = false>(time: number | bigint, options: MsOptions<R> = {}): string | RawMS {
+		if (typeof time !== "bigint") time = BigInt(time);
 		options = options ?? {};
-		options = Object.assign(options, {
+		options = {
 			words:     false,
 			seconds:   true,
 			ms:        false,
 			shortMS:   true,
-			raw:       false,
-			monthAbbr: "mn"
-		});
-		const r: RawMS = {
-			// Number.EPSILON = https://stackoverflow.com/a/11832950
-			milliseconds: 0,
-			seconds:      0,
-			minutes:      0,
-			hours:        0,
-			days:         0,
-			months:       0,
-			years:        0
+			raw:       false as R,
+			monthAbbr: "mn",
+			...options
 		};
-		if (time < 0) throw new TypeError("Negative time provided.");
-		if (time === 0) {
-			if (options.raw) return r;
+		const r: RawMSBigInt = {
+			milliseconds: 0n,
+			seconds:      0n,
+			minutes:      0n,
+			hours:        0n,
+			days:         0n,
+			months:       0n,
+			years:        0n
+		};
+		const convert = (obj: RawMSBigInt) => Object.entries(obj).map(([key, value]) => ({ [key]: Number(value) })).reduce((a, b) => ({ ...a, ...b }), {}) as unknown as MsResponse;
+		if (time < 0n) throw new TypeError("Negative time provided.");
+		if (time === 0n) {
+			if (options.raw) return convert(r);
 			else return options.words ? "0 seconds" : "0s";
 		}
 		// Number.EPSILON = https://stackoverflow.com/a/11832950
-		r.milliseconds = Math.round(((time % 1000) + Number.EPSILON) * 100) / 100;
-		r.years = Math.floor(time / 3.154e+10);
-		time -= r.years * 3.154e+10;
-		r.months = Math.floor(time / 2.628e+9);
-		time -= r.months * 2.628e+9;
-		r.days = Math.floor(time / 8.64e+7);
-		time -= r.days * 8.64e+7;
-		r.hours = Math.floor(time / 3.6e+6);
-		time -= r.hours * 3.6e+6;
-		r.minutes = Math.floor(time / 6e4);
-		time -= r.minutes * 6e4;
-		r.seconds = Math.floor(time / 1e3);
-		time -= r.seconds * 1e3;
+		r.milliseconds = time % 1000n;
+		r.years = time / 31540000000n;
+		time -= r.years * 31540000000n;
+		r.months = time / 2628000000n;
+		time -= r.months * 2628000000n;
+		r.days = time / 86400000n;
+		time -= r.days * 86400000n;
+		r.hours = time / 3600000n;
+		time -= r.hours * 3600000n;
+		r.minutes = time / 60000n;
+		time -= r.minutes * 60000n;
+		r.seconds = time / 1000n;
+		time -= r.seconds * 1000n;
 
-		const total = (Object.values(r) as Array<number>).reduce((a, b) => a + b, 0);
-		if (options.raw) return r;
+		const total = (Object.values(r) as Array<bigint>).reduce((a, b) => a + b, 0n);
+		if (options.raw) return convert(r);
 		else {
 			if (!options.ms && r.milliseconds === total) return options.words ? "less than one second" : "none";
 			if (!options.seconds && r.seconds === total) return options.words ? "less than one minute" : "none";
 		}
 
 		const str: Array<string> = [];
-		if (r.milliseconds > 0 && options.ms) str.push(`${r.milliseconds} ${options.words ? `millisecond${r.milliseconds === 1 ? "" : "s"}` : "ms"}`);
-		if (r.seconds > 0 && options.seconds) str.push(`${r.seconds} ${options.words ? `second${r.seconds === 1 ? "" : "s"}` : "s"}`);
-		if (r.minutes > 0) str.push(`${r.minutes} ${options.words ? `minute${r.minutes === 1 ? "" : "s"}` : "m"}`);
-		if (r.hours > 0) str.push(`${r.hours} ${options.words ? `hour${r.hours === 1 ? "" : "s"}` : "h"}`);
-		if (r.days > 0) str.push(`${r.days} ${options.words ? `day${r.days === 1 ? "" : "s"}` : "d"}`);
-		if (r.months > 0) str.push(`${r.months} ${options.words ? `month${r.months === 1 ? "" : "s"}` : options.monthAbbr!}`);
-		if (r.years > 0) str.push(`${r.years} ${options.words ? `year${r.years === 1 ? "" : "s"}` : "y"}`);
+		if (r.milliseconds > 0 && options.ms) str.push(`${r.milliseconds}${options.words && !options.shortMS ? ` millisecond${r.milliseconds === 1n ? "" : "s "}` : "ms"}`);
+		if (r.seconds > 0 && options.seconds) str.push(`${r.seconds}${options.words ? ` second${r.seconds === 1n ? "" : "s"}` : "s"}`);
+		if (r.minutes > 0) str.push(`${r.minutes}${options.words ? ` minute${r.minutes === 1n ? "" : "s"}` : "m"}`);
+		if (r.hours > 0) str.push(`${r.hours}${options.words ? ` hour${r.hours === 1n ? "" : "s"}` : "h"}`);
+		if (r.days > 0) str.push(`${r.days}${options.words ? ` day${r.days === 1n ? "" : "s"}` : "d"}`);
+		if (r.months > 0) str.push(`${r.months}${options.words ? ` month${r.months === 1n ? "" : "s"}` : options.monthAbbr!}`);
+		if (r.years > 0) str.push(`${r.years}${options.words ? ` year${r.years === 1n ? "" : "s"}` : "y"}`);
 
 		if (options.words && str.length > 1) str[0] = `and ${str[0]}`;
 
-		return  str.join(options.words ? "," : "");
+		return  str.reverse().join(" ");
 	}
 
 	/**
