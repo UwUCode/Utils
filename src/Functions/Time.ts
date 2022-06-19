@@ -23,7 +23,7 @@ export default class Time {
 	 */
 	static ms<R extends boolean = false>(time: number | bigint, options?: MsOptions<R>): R extends false ? string : RawMS;
 	static ms<R extends boolean = false>(time: number | bigint, options: MsOptions<R> = {}): string | RawMS {
-		if (typeof time !== "bigint") time = BigInt(time);
+		if (typeof time !== "bigint") time = BigInt(Math.floor(time));
 		options = options ?? {};
 		options = {
 			words:     false,
