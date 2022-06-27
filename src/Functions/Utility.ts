@@ -116,18 +116,18 @@ export default class Utility {
 	 * @static
 	 * @param {Redis} client - the redis client to use
 	 * @param {string} pattern - The seatch pattern to use.
+	 * @param {number} [maxPerRun=2500] - The maximum amount of keys to fetch per round.
 	 * @param {string} [cursorStart="0"] - Internal use only.
 	 * @param {Array<string>} [keys=[]] - Internal use only, provide undefined or an empty array.
-	 * @param {number} [maxPerRun=2500] - The maximum amount of keys to fetch per round.
 	 * @returns {Promise<Array<string>>}
 	 * @memberof Utility
 	 * @example getKeys("some:pattern":*);
 	 * @example getKeys("some:*:pattern", undefined, undefined, 10000);
 	 */
-	static async getKeys(client: Redis, pattern: string, cursorStart = "0", keys = [] as Array<string>, maxPerRun = 2500): Promise<Array<string>> {
+	static async getKeys(client: Redis, pattern: string, maxPerRun = 2500, cursorStart = "0", keys = [] as Array<string>): Promise<Array<string>> {
 		const [cursorEnd, k] = await client.scan(cursorStart, "MATCH", pattern, "COUNT", maxPerRun);
 		keys.push(...k);
-		if (cursorEnd !== "0") return this.getKeys(client, pattern, cursorEnd, keys, maxPerRun);
+		if (cursorEnd !== "0") return this.getKeys(client, pattern, maxPerRun, cursorEnd, keys);
 		// by design duplicate keys can be returned
 		else return Array.from(new Set(keys));
 	}
