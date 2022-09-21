@@ -1,5 +1,4 @@
 import Internal from "./Functions/Internal";
-import LegalAss from "./Functions/LegalAss";
 import Strings from "./Functions/Strings";
 import Time from "./Functions/Time";
 import Utility from "./Functions/Utility";
@@ -11,7 +10,6 @@ import pid from "./Other/pid";
 export * from "./types";
 export {
 	Internal,
-	LegalAss,
 	Strings,
 	Time,
 	Utility,

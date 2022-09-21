@@ -1,4 +1,3 @@
-import LegalAss from "./LegalAss";
 import crypto from "crypto";
 import { URL } from "url";
 import { resolve } from "path";
@@ -67,7 +66,13 @@ export default class Strings {
 	 * @returns {string}
 	 */
 	static truncateWords(str: string, limit: number, ellipses = true) {
-		return LegalAss.call(this, str, limit, ellipses);
+		if (str.length <= limit) return str;
+		let result = "";
+		for (const part of str.split(" ")) {
+			if (result.length + part.length + (ellipses ? 6 : 0) > limit) break;
+			result += `${part} `;
+		}
+		return `${result}${ellipses === true ? " (...)" : ""}`;
 	}
 
 	/**
