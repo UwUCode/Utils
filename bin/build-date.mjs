@@ -2,9 +2,8 @@
 import { access } from "fs/promises";
 import buildDate from "../dist/Other/BuildDate.js";
 
-console.log(buildDate);
 if(process.argv[2] === undefined || !await access(process.argv[2]).then(() => true, () => false)) {
-    console.error("Invalid path");
+    console.error("Invalid Path Provided");
     process.exit(1);
 }
 
