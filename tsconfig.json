@@ -1,5 +1,5 @@
 {
-  "extends": "@uwu-codes/tsconfig",
+  "extends": "@uwu-codes/tsconfig/esm",
   "compilerOptions": {
     "outDir": "./dist",
     "declaration": true,

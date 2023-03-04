@@ -1,10 +1,10 @@
 export default class Strings extends null {
     /**
-     * Make the first letter of every word uppercase.
-     * @param str The string to perform the operation on.
+     * Convert camelCase to snake_case.
+     * @param str The string to change.
      */
-    static ucwords(str: string) {
-        return str.toString().toLowerCase().replace(/^(.)|\s+(.)/g, r => r.toUpperCase());
+    static camelCaseToSnakeCase(str: string) {
+        return str.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
     }
 
     /**
@@ -28,6 +28,30 @@ export default class Strings extends null {
         } else {
             return `${str} B`;
         }
+    }
+
+    /**
+     * Returns the array joined together with an and.
+     * @deprecated Candidate for removal.
+     * @param arr The provided array.
+     */
+    static joinAnd(arr: Array<unknown>, joiner = ", ") {
+        if (arr.length === 1) {
+            return String(arr[0]);
+        }
+        const last = arr.splice(- 1, 1)[0];
+        return `${arr.join(joiner)}, and ${last as string}`;
+    }
+
+    /**
+     * Returns the provided string with the plural character if the array length or value is not 1.
+     * @deprecated Candidate for removal.
+     * @param str The provided string.
+     * @param arr The provided array or number.
+     * @param plural The character to add if plural.
+     */
+    static plural(str: string, val: ArrayLike<unknown> | number, plural = "s") {
+        return `${str}${(Array.isArray(val) ? val.length : val) === 1 ? "" : plural}`;
     }
 
     /**
@@ -59,36 +83,12 @@ export default class Strings extends null {
         }
         return `${result}${ellipses === true ? " (...)" : ""}`;
     }
-
     /**
-     * Convert camelCase to snake_case.
-     * @param str The string to change.
+     * Make the first letter of every word uppercase.
+     * @param str The string to perform the operation on.
      */
-    static camelCaseToSnakeCase(str: string) {
-        return str.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
-    }
-    /**
-     * Returns the provided string with the plural character if the array length or value is not 1.
-     * @deprecated Candidate for removal.
-     * @param str The provided string.
-     * @param arr The provided array or number.
-     * @param plural The character to add if plural.
-     */
-    static plural(str: string, val: ArrayLike<unknown> | number, plural = "s") {
-        return `${str}${(Array.isArray(val) ? val.length : val) === 1 ? "" : plural}`;
-    }
-
-    /**
-     * Returns the array joined together with an and.
-     * @deprecated Candidate for removal.
-     * @param arr The provided array.
-     */
-    static joinAnd(arr: Array<unknown>, joiner = ", ") {
-        if (arr.length === 1) {
-            return String(arr[0]);
-        }
-        const last = arr.splice(- 1, 1)[0];
-        return `${arr.join(joiner)}, and ${last as string}`;
+    static ucwords(str: string) {
+        return str.toString().toLowerCase().replace(/^(.)|\s+(.)/g, r => r.toUpperCase());
     }
 
     /**

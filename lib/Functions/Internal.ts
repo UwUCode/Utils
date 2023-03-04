@@ -9,8 +9,8 @@ export default class Internal extends null {
         // WINDOWS = wmic logicaldisk get size,freespace,caption
 
         const drives: Record<string, {
-                total: number;
                 free: number;
+                total: number;
             }> = {},
             unix = process.platform !== "win32",
             out = await new Promise<Array<Array<string>>>((resolve, reject) => exec(unix ? "df -Pk \"/\"" : "wmic logicaldisk get size,freespace,caption", (err, stdout, stderr) => {

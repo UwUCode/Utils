@@ -10,6 +10,96 @@ import chunk from "chunk";
 
 
 export default class Time extends null {
+
+    /**
+     * Convert ms/mi/ns to the highest possible value
+     * @param input The input to convert.
+     * @param type The measure of the input.
+     */
+    static convert(input: number, type: "ms" | "mi" | "ns", dec = 3): string {
+        input = parseFloat(input.toFixed(dec));
+        switch (type) {
+            case "ms": {
+                return input < 1000 ? `${input}ms` : this.ms(input, { words: true, seconds: true, ms: true });
+            }
+            case "mi": {
+                return input < 1000 ? `${input}µs` : this.convert(input / 1000, "ms", dec);
+            }
+            case "ns": {
+                return input < 1000 ? `${input}ns` : this.convert(input / 1000, "mi", dec);
+            }
+            default: {
+                return `${input}${String(type)}`;
+            }
+        }
+    }
+
+    /**
+     * Convert a date object into DD/MM/YYYY HH:MM:SS.
+     * @param date The object to convert.
+     */
+    static dateToReadable(date: Date | number | string) {
+        if (!(date instanceof Date)) {
+            date = new Date(date);
+        }
+        return `${[date.getMonth().toString().padStart(2, "0"),
+            (date.getDate() + 1).toString().padStart(2, "0"),
+            date.getFullYear()].join("/")} ${[
+            date.getHours().toString().padStart(2, "0"),
+            date.getMinutes().toString().padStart(2, "0"),
+            date.getSeconds().toString().padStart(2, "0")].join(":")}`;
+    }
+
+    /**
+     * Format milliseconds ago.
+     * @static
+     * @param time The milliseconds to format.
+     * @param sub If we should sub the ms provided from the current time.
+     * @param seconds If seconds should be included in the return.
+     * @param firstOnly If only the first value should be returned.
+     */
+    static formatAgo(time: number | Date, sub?: boolean, seconds?: boolean, firstOnly?: boolean) {
+        if (time instanceof Date) {
+            time = time.getTime();
+        }
+        if (sub) {
+            time = Date.now() - time;
+        }
+        const v = Time.ms(time, { words: true, seconds });
+        return `${firstOnly ? v.split(",")[0] : v} ago`;
+    }
+
+    /**
+     * format a date into dd/mm/yyyy hh:mm:ss.ms
+     * @param options the options for formatting.
+     */
+    static formatDateWithPadding(options: FormatDateOptions) {
+        if (typeof options.date === "number") {
+            options.date = new Date(options.date);
+        }
+        const months = [
+                "January", "February", "March", "April",
+                "May", "June", "July", "August",
+                "September", "October", "November", "December"
+            ],
+            days = [
+                "Sunday", "Monday", "Tuesday",
+                "Wednesday", "Thursday", "Friday",
+                "Saturday"
+            ],
+            h = options.date.getHours() % 12;
+        return options.words ? `${days[options.date.getDay()]} ${months[options.date.getMonth()]} ${(options.date.getDate()).toString().padStart(2, "0")}, ${options.date.getFullYear()} ${h  === 0 ? 12 : h.toString().padStart(2, "0")}:${options.date.toString().padStart(2, "0")}:${options.date.getSeconds().toString().padStart(2, "0")} ${options.date.getHours() < 12 ? "AM" : "PM"}` : `${(options.date.getMonth() + 1).toString().padStart(2, "0")}/${(options.date.getDate()).toString().padStart(2, "0")}/${options.date.getFullYear()}${options.hms ? ` ${(h  === 0 ? 12 : h).toString().padStart(2, "0")}:${(options.date.getMinutes()).toString().padStart(2, "0")}:${(options.date.getSeconds()).toString().padStart(2, "0")}` : ""}${options.millis ? `.${(options.date.getMilliseconds()).toString().padStart(3, "0")}` : ""}`;
+    }
+
+    /**
+     * Get the number of days in a given month.
+     * Not zero based.
+     * @param month The month to get the days for.
+     */
+    static getDaysInMonth(month: number) {
+        return new Date(new Date().getFullYear(), month, 0).getDate();
+    }
+
     /**
      * Convert milliseconds into readable time.
      * @static
@@ -111,98 +201,6 @@ export default class Time extends null {
     }
 
     /**
-     * Convert ms/mi/ns to the highest possible value
-     * @param input The input to convert.
-     * @param type The measure of the input.
-     */
-    static convert(input: number, type: "ms" | "mi" | "ns", dec = 3): string {
-        input = parseFloat(input.toFixed(dec));
-        switch (type) {
-            case "ms": {
-                return input < 1000 ? `${input}ms` : this.ms(input, { words: true, seconds: true, ms: true });
-            }
-            case "mi": {
-                return input < 1000 ? `${input}µs` : this.convert(input / 1000, "ms", dec);
-            }
-            case "ns": {
-                return input < 1000 ? `${input}ns` : this.convert(input / 1000, "mi", dec);
-            }
-            default: {
-                return `${input}${String(type)}`;
-            }
-        }
-    }
-
-    /**
-     * Format milliseconds ago.
-     * @static
-     * @param time The milliseconds to format.
-     * @param sub If we should sub the ms provided from the current time.
-     * @param seconds If seconds should be included in the return.
-     * @param firstOnly If only the first value should be returned.
-     */
-    static formatAgo(time: number | Date, sub?: boolean, seconds?: boolean, firstOnly?: boolean) {
-        if (time instanceof Date) {
-            time = time.getTime();
-        }
-        if (sub) {
-            time = Date.now() - time;
-        }
-        const v = Time.ms(time, { words: true, seconds });
-        return `${firstOnly ? v.split(",")[0] : v} ago`;
-    }
-
-    /**
-     * format a date into dd/mm/yyyy hh:mm:ss.ms
-     * @param options the options for formatting.
-     */
-    static formatDateWithPadding(options: FormatDateOptions) {
-        if (typeof options.date === "number") {
-            options.date = new Date(options.date);
-        }
-        const months = [
-                "January", "February", "March", "April",
-                "May", "June", "July", "August",
-                "September", "October", "November", "December"
-            ],
-            days = [
-                "Sunday", "Monday", "Tuesday",
-                "Wednesday", "Thursday", "Friday",
-                "Saturday"
-            ],
-            h = options.date.getHours() % 12;
-        return options.words ? `${days[options.date.getDay()]} ${months[options.date.getMonth()]} ${(options.date.getDate()).toString().padStart(2, "0")}, ${options.date.getFullYear()} ${h  === 0 ? 12 : h.toString().padStart(2, "0")}:${options.date.toString().padStart(2, "0")}:${options.date.getSeconds().toString().padStart(2, "0")} ${options.date.getHours() < 12 ? "AM" : "PM"}` : `${(options.date.getMonth() + 1).toString().padStart(2, "0")}/${(options.date.getDate()).toString().padStart(2, "0")}/${options.date.getFullYear()}${options.hms ? ` ${(h  === 0 ? 12 : h).toString().padStart(2, "0")}:${(options.date.getMinutes()).toString().padStart(2, "0")}:${(options.date.getSeconds()).toString().padStart(2, "0")}` : ""}${options.millis ? `.${(options.date.getMilliseconds()).toString().padStart(3, "0")}` : ""}`;
-    }
-
-    /**
-     * Convert a date object into DD/MM/YYYY HH:MM:SS.
-     * @param date The object to convert.
-     */
-    static dateToReadable(date: Date | number | string) {
-        if (!(date instanceof Date)) {
-            date = new Date(date);
-        }
-        return `${[date.getMonth().toString().padStart(2, "0"),
-            (date.getDate() + 1).toString().padStart(2, "0"),
-            date.getFullYear()].join("/")} ${[
-            date.getHours().toString().padStart(2, "0"),
-            date.getMinutes().toString().padStart(2, "0"),
-            date.getSeconds().toString().padStart(2, "0")].join(":")}`;
-    }
-
-    /**
-     * Convert seconds to HH:MM:SS.
-     * @param sec The seconds to convert.
-     */
-    static secondsToHMS(sec: number) {
-        const hours: number = Math.floor(sec / 3600),
-            minutes: number = Math.floor((sec - (hours * 3600)) / 60),
-            seconds: number = Math.floor(sec - (hours * 3600) - (minutes * 60));
-
-        return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
-    }
-
-    /**
      * Parse a string into milliseconds.
      * @deprecated candidate for removal
      * @param str The string to parse.
@@ -240,11 +238,14 @@ export default class Time extends null {
     }
 
     /**
-     * Get the number of days in a given month.
-     * Not zero based.
-     * @param month The month to get the days for.
+     * Convert seconds to HH:MM:SS.
+     * @param sec The seconds to convert.
      */
-    static getDaysInMonth(month: number) {
-        return new Date(new Date().getFullYear(), month, 0).getDate();
+    static secondsToHMS(sec: number) {
+        const hours: number = Math.floor(sec / 3600),
+            minutes: number = Math.floor((sec - (hours * 3600)) / 60),
+            seconds: number = Math.floor(sec - (hours * 3600) - (minutes * 60));
+
+        return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
     }
 }
